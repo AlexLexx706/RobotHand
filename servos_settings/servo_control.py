@@ -7,7 +7,7 @@ import math
 
 class ServoControl(QtGui.QGroupBox):
     value_changed = pyqtSignal(int, int)
-    angle_changed = pyqtSignal(int, int)
+    angle_changed = pyqtSignal(int, float)
     remove_control = pyqtSignal(object)
     
     def __init__(self, index, settings=QtCore.QSettings("AlexLexx", "robot_hand"), parent=None):
@@ -17,18 +17,44 @@ class ServoControl(QtGui.QGroupBox):
         self.index = index
         self.setTitle("ID:{}".format(index))
         self.addAction(self.action_remove)
+        self.load_default()
         
+    
+    def load_default(self):
         #инициализация параметров
         self.settings.beginGroup("servo_control")
         self.settings.beginGroup(str(self.index))
 
+        self.spinBox_min_value.blockSignals(True)
+        self.spinBox_max_value.blockSignals(True)
+        self.doubleSpinBox_min_angle.blockSignals(True)
+        self.doubleSpinBox_max_angle.blockSignals(True)
+        
         self.spinBox_min_value.setValue(self.settings.value("min_value", 500).toInt()[0])
         self.spinBox_max_value.setValue(self.settings.value("max_value", 2500).toInt()[0])
+
+        if self.spinBox_min_value.value() < self.spinBox_max_value.value():
+            self.spinBox_value.setMinimum(self.spinBox_min_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_max_value.value())
+        else:
+            self.spinBox_value.setMinimum(self.spinBox_max_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_min_value.value())
+        
         self.doubleSpinBox_min_angle.setValue(self.settings.value("min_angle", 0.0).toDouble()[0])
         self.doubleSpinBox_max_angle.setValue(self.settings.value("max_angle", 180).toDouble()[0])
-        
-        self.spinBox_value.setValue(self.settings.value("value", 500).toInt()[0])
 
+        if self.doubleSpinBox_min_angle.value() < self.doubleSpinBox_max_angle.value():
+            self.doubleSpinBox_angle.setMinimum(self.doubleSpinBox_min_angle.value())
+            self.doubleSpinBox_angle.setMaximum(self.doubleSpinBox_max_angle.value())
+        else:
+            self.doubleSpinBox_angle.setMaximum(self.doubleSpinBox_min_angle.value())
+            self.doubleSpinBox_angle.setMinimum(self.doubleSpinBox_max_angle.value())
+        
+        self.spinBox_min_value.blockSignals(False)
+        self.spinBox_max_value.blockSignals(False)
+        self.doubleSpinBox_min_angle.blockSignals(False)
+        self.doubleSpinBox_max_angle.blockSignals(False)
+        self.set_value(self.settings.value("value", 500).toInt()[0])
         self.settings.endGroup()
         self.settings.endGroup()
     
@@ -55,11 +81,14 @@ class ServoControl(QtGui.QGroupBox):
     def on_spinBox_min_value_valueChanged(self, value):
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
-        
-        self.spinBox_max_value.setMinimum(value)
-        self.horizontalSlider_value.setMinimum(value)
-        self.spinBox_value.setMinimum(value)
-        
+
+        if self.spinBox_min_value.value() < self.spinBox_max_value.value():
+            self.spinBox_value.setMinimum(self.spinBox_min_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_max_value.value())
+        else:
+            self.spinBox_value.setMinimum(self.spinBox_max_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_min_value.value())
+
         #Сохраним значения
         self.settings.beginGroup("servo_control")
         self.settings.beginGroup(str(self.index))
@@ -67,20 +96,31 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.endGroup()
         self.settings.endGroup()
         
-        self.update_value(self.spinBox_value.value())
+        self.set_value(self.spinBox_value.value())
 
         self.horizontalSlider_value.blockSignals(False)
         self.spinBox_value.blockSignals(False)
-
+    
+    @pyqtSlot('int')
+    def on_horizontalSlider_value_valueChanged(self, value):
+        value = int(value / float(self.horizontalSlider_value.maximum()) *\
+               (self.spinBox_max_value.value() - self.spinBox_min_value.value()) +\
+               self.spinBox_min_value.value())
+        #print "value: ", value
+        
+        self.set_value(value)
 
     @pyqtSlot('int')
     def on_spinBox_max_value_valueChanged(self, value):
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
         
-        self.spinBox_min_value.setMaximum(value)
-        self.horizontalSlider_value.setMaximum(value)
-        self.spinBox_value.setMaximum(value)
+        if self.spinBox_min_value.value() < self.spinBox_max_value.value():
+            self.spinBox_value.setMinimum(self.spinBox_min_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_max_value.value())
+        else:
+            self.spinBox_value.setMinimum(self.spinBox_max_value.value())
+            self.spinBox_value.setMaximum(self.spinBox_min_value.value())
         
         #Сохраним значения
         self.settings.beginGroup("servo_control")
@@ -89,14 +129,14 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.endGroup()
         self.settings.endGroup()
         
-        self.update_value(self.spinBox_value.value())
+        self.set_value(self.spinBox_value.value())
         
         self.horizontalSlider_value.blockSignals(False)
         self.spinBox_value.blockSignals(False)
     
     @pyqtSlot('int')
     def on_spinBox_value_valueChanged(self, value):
-        self.update_value(value)
+        self.set_value(value)
         
     @pyqtSlot('double')
     def on_doubleSpinBox_min_angle_valueChanged(self, value):
@@ -115,7 +155,7 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.endGroup()
         self.settings.endGroup()
         
-        self.update_angle(self.doubleSpinBox_angle.value())
+        self.set_angle(self.doubleSpinBox_angle.value())
         self.doubleSpinBox_angle.blockSignals(False) 
         
     @pyqtSlot('double')
@@ -135,7 +175,7 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.endGroup()
         self.settings.endGroup()
 
-        self.update_angle(self.doubleSpinBox_angle.value())
+        self.set_angle(self.doubleSpinBox_angle.value())
         self.doubleSpinBox_angle.blockSignals(False) 
     
     @pyqtSlot('int')
@@ -144,13 +184,13 @@ class ServoControl(QtGui.QGroupBox):
                (self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value()) +\
                self.doubleSpinBox_min_angle.value()
         
-        self.update_angle(angle)
+        self.set_angle(angle)
     
     @pyqtSlot('double')
     def on_doubleSpinBox_angle_valueChanged(self, value):
-        self.update_angle(value)
+        self.set_angle(value)
     
-    def update_value(self, value):
+    def set_value(self, value):
         '''Обновилось значение'''
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
@@ -162,23 +202,17 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.setValue("value", value)
         self.settings.endGroup()
         self.settings.endGroup()
-
         
-        self.horizontalSlider_value.setValue(value)
+        #установка значения
         self.spinBox_value.setValue(value)
+        norm_value = abs((self.spinBox_min_value.value() - value) / float(self.spinBox_max_value.value() - self.spinBox_min_value.value()))
+        self.horizontalSlider_value.setValue(int(norm_value * self.horizontalSlider_value.maximum()))
         
-        angle = ((self.spinBox_value.value() - self.spinBox_min_value.value()) /\
-                float(self.spinBox_max_value.value() - self.spinBox_min_value.value())) *\
-                (self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value()) +\
-                self.doubleSpinBox_min_angle.value()
+        #установка угла
+        angle = norm_value * (self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value()) + self.doubleSpinBox_min_angle.value()
         
         self.doubleSpinBox_angle.setValue(angle)
-
-        slider_value = ((self.doubleSpinBox_min_angle.value() - angle) /\
-                float(self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value())) *\
-                self.horizontalSlider_angle.maximum()
-
-        self.horizontalSlider_angle.setValue(abs(slider_value))
+        self.horizontalSlider_angle.setValue(int(norm_value * self.horizontalSlider_angle.maximum()))
 
         self.horizontalSlider_value.blockSignals(False)
         self.spinBox_value.blockSignals(False)
@@ -188,7 +222,7 @@ class ServoControl(QtGui.QGroupBox):
         self.value_changed.emit(self.index, value)
         self.angle_changed.emit(self.index, angle)
         
-    def update_angle(self, angle):
+    def set_angle(self, angle):
         '''Обновился угол'''
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
@@ -197,14 +231,10 @@ class ServoControl(QtGui.QGroupBox):
        
         
         self.doubleSpinBox_angle.setValue(angle)
-        slider_value = ((self.doubleSpinBox_min_angle.value() - angle) /\
-                float(self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value())) *\
-                self.horizontalSlider_angle.maximum()
-        self.horizontalSlider_angle.setValue(abs(slider_value))
+        norm_value = abs(((self.doubleSpinBox_min_angle.value() - angle) / float(self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value())))
+        self.horizontalSlider_angle.setValue(int(norm_value * self.horizontalSlider_angle.maximum()))
 
-        value = int((angle - self.doubleSpinBox_min_angle.value())/\
-            float(self.doubleSpinBox_max_angle.value() - self.doubleSpinBox_min_angle.value()) * \
-            (self.spinBox_max_value.value() - self.spinBox_min_value.value()) + self.spinBox_min_value.value())
+        value = norm_value * (self.spinBox_max_value.value() - self.spinBox_min_value.value()) + self.spinBox_min_value.value()
 
         self.settings.beginGroup("servo_control")
         self.settings.beginGroup(str(self.index))
@@ -212,7 +242,7 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.endGroup()
         self.settings.endGroup()
 
-        self.horizontalSlider_value.setValue(value)
+        self.horizontalSlider_value.setValue(norm_value * self.horizontalSlider_value.maximum())
         self.spinBox_value.setValue(value)
         
         self.horizontalSlider_value.blockSignals(False)

@@ -60,10 +60,10 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;значение&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="minimum">
-         <number>500</number>
+         <number>0</number>
         </property>
         <property name="maximum">
-         <number>2500</number>
+         <number>3000</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -229,6 +229,16 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>spinBox_min_value</tabstop>
+  <tabstop>horizontalSlider_value</tabstop>
+  <tabstop>spinBox_value</tabstop>
+  <tabstop>spinBox_max_value</tabstop>
+  <tabstop>doubleSpinBox_min_angle</tabstop>
+  <tabstop>horizontalSlider_angle</tabstop>
+  <tabstop>doubleSpinBox_angle</tabstop>
+  <tabstop>doubleSpinBox_max_angle</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -254,12 +264,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>14</y>
+     <x>325</x>
+     <y>33</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>11</y>
+     <x>278</x>
+     <y>30</y>
     </hint>
    </hints>
   </connection>

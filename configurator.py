@@ -13,6 +13,8 @@ class Configurator(QtGui.QMainWindow):
         self.groupBox_settings.value_changed.connect(self.scene_view.on_value_changed)
         self.groupBox_settings.angle_changed.connect(self.scene_view.on_angle_changed)
         
+        self.scene_view.angles_changed.connect(self.groupBox_settings.on_angles_changed)
+        
 
 if __name__ == '__main__':
     import sys

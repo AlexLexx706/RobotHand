@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class ServosSettings(QtGui.QGroupBox):
     value_changed = pyqtSignal(int, int)
-    angle_changed = pyqtSignal(int, int)
+    angle_changed = pyqtSignal(int, float)
     
     def __init__(self, parent=None, settings=QtCore.QSettings("AlexLexx", "robot_hand")):
         super(QtGui.QGroupBox, self).__init__(parent)
@@ -21,12 +21,21 @@ class ServosSettings(QtGui.QGroupBox):
         self.settings = settings
         self.scrollArea.addAction(self.action_add_servo)
         self.controlls = []
+        self.controlls_map = {}
 
         #инициализация параметров
         self.settings.beginGroup("servo_control")
         self.settings.endGroup()
         
         self.open_settings(self.settings.value("last_file").toString())
+    
+    def on_angles_changed(self, data):
+        for index, angle in data:
+            if index in self.controlls_map:
+                controll = self.controlls_map[index]
+                controll.blockSignals(True)
+                controll.set_angle(angle)
+                controll.blockSignals(False)
     
     def get_servo_ids(self):
         return [ c.index for c in self.controlls]
@@ -43,6 +52,7 @@ class ServosSettings(QtGui.QGroupBox):
             controll = ServoControl(index, self.settings)
             controll.value_changed.connect(self.value_changed)
             controll.angle_changed.connect(self.angle_changed)
+            self.controlls_map[index] = controll
     
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
@@ -54,6 +64,7 @@ class ServosSettings(QtGui.QGroupBox):
     def remove_control(self, control):
         self.verticalLayout.removeWidget(control)
         self.controlls.remove(control)
+        del self.controlls_map[control.index]
         control.hide()
 
         self.settings.beginGroup("servo_control")
