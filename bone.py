@@ -54,15 +54,13 @@ class Bone(MyFrame):
         return angle
 
     def set_proj_angle(self, freedom, angle, axis, up, vec):
-        if freedom is None:
-            return
+        if freedom is not None:
+            '''Выстовить угол проекции вектора на плоскость axis, up с учётом проидолов'''
+            if angle < freedom[0]:
+                angle = freedom[0]
 
-        '''Выстовить угол проекции вектора на плоскость axis, up с учётом проидолов'''
-        if angle < freedom[0]:
-            angle = freedom[0]
-
-        if angle > freedom[1]:
-            angle = freedom[1]
+            if angle > freedom[1]:
+                angle = freedom[1]
 
         #установим угол
         offset_angle = angle - self.get_proj_angle(axis, up, vec)

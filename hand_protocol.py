@@ -14,10 +14,12 @@ class HandProtocol(protocol.Protocol):
         except Exception as e:
             print e
 
-        self.limmits = [[[-70 / 180. * math.pi, 2391], [90 / 180. * math.pi, 543], 1],
+        self.limmits = [[[-65 / 180. * math.pi, 2395], [90 / 180. * math.pi, 543], 1],
                         [[-135 / 180. * math.pi, 543], [0 / 180. * math.pi, 2065], 2],
                         [[-150 / 180. * math.pi, 2500], [0 / 180. * math.pi, 804], 3],
-                        [[0 / 180. * math.pi, 935], [130 / 180. * math.pi, 2391], 4]]
+                        [[0 / 180. * math.pi, 1000], [110 / 180. * math.pi, 2300], 4],
+                        [[-85 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870], 5],
+                        [[0 / 180. * math.pi, 1239], [85 / 180. * math.pi, 1913], 6]]
     
     def rotate(self, id, angle):
         if id < 0 or id >= len(self.limmits):
@@ -49,16 +51,20 @@ class HandProtocol(protocol.Protocol):
 
 
     def move_hand(self, angles):
-        if len(angles) != 4:
+        if len(angles) != len(self.limmits):
             return
-
+        logger.debug("move_hand({})".format(angles))
         self.move_servos([self.get_angle(i, a) for i, a in enumerate(angles)], 0.05)
 
 if __name__ == "__main__":
     import time
     import math
+    import sys
     logging.basicConfig(level=logging.DEBUG)
     proto = HandProtocol(port="COM27", baudrate=128000)
+    proto.rotate(5, 45 / 180. * math.pi)
+    sys.exit()
+    
     proto.rotate(0, 0 / 180. * math.pi)
     time.sleep(1)
     proto.rotate(0, -45 / 180. * math.pi)
