@@ -118,10 +118,10 @@ class Hand:
 
             self.cmd_queue.put((1, data))
 
-    def calk_ik_pos(self, target):
+    def calk_ik_pos(self, target, count=1):
         '''Установить конец манипулятора в заданную точку'''
-        self.end.calk_ik_pos_2(((target, vector(0.0, 0.0, 0.0), 1.0), ))
-        print self.b0.get_angle_x() / math.pi * 180.0
+        for i in range(count):
+            pos = self.end.calk_ik_pos_2(((target, vector(0.0, 0.0, 0.0), 1.0), ))
 
         if self.cmd_queue is not None:
             ct = time.time()
@@ -136,6 +136,7 @@ class Hand:
                         self.sponge_angle]
                 self.last_time = ct
                 self.cmd_queue.put((1, data))
+        return pos
     
     def get_target_pos(self):
         '''Получить точку конца манипулятора'''
@@ -148,4 +149,62 @@ class Hand:
     def get_hand_angle(self, angle):
         '''Вращать руку'''
         return self.b4.get_angle_y()
+
+# class State:
+#     def __init__(self, *args, **kwargs):
+#         '''Состояние'''
+#         pass
+#
+#     def run(self):
+#         pass
+#
+#     def next_state(self):
+#         pass
+
+class StateGetTarget:
+    def __init__(self, hand, target, new_target_pos):
+        '''Состояние взять цель'''
+        self.hand=hand
+        self.target=target
+        self.new_target_pos = new_target_pos
+
+    def run(self):
+        '''Реализация забора цели'''
+        #1) откроем схват
+        self.hand.open_sponges()
+        time.sleep(1)
+
+        #2) переместим схват над целью
+        self.hand.calk_ik_pos(self.target + vector(0,50,0), count=10)
+        time.sleep(1)
+
+
+        #2) опустим на цель
+        self.hand.calk_ik_pos(self.target, count=10)
+        time.sleep(1)
+
+
+        #3) Сожмём схват
+        self.hand.set_sponge_value(40/180*math.pi)
+        time.sleep(1)
+
+        #4) поднять над позицией на безопасное раасстояние
+        self.hand.calk_ik_pos(self.target + vector(0,50,0), count=10)
+        time.sleep(1)
+
+        #5) преренесём на новую позицию
+        self.hand.calk_ik_pos(self.new_target_pos + vector(0,50,0), count=10)
+        time.sleep(1)
+
+        self.hand.calk_ik_pos(self.new_target_pos, count=10)
+        time.sleep(1)
+
+        self.hand.open_sponges()
+        time.sleep(1)
+
+        self.hand.calk_ik_pos(self.new_target_pos + vector(0,50,0), count=10)
+        time.sleep(1)
+
+
+
         

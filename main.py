@@ -3,7 +3,7 @@
 from __future__ import division
     
 if __name__ == '__main__':
-    from hand import Hand
+    from hand import Hand, StateGetTarget
     from visual import * 
     import wx
     import time
@@ -41,6 +41,9 @@ if __name__ == '__main__':
         '''Установить в безопасное положение'''
         hand.set_save_state()
 
+    def start_anim(evt):
+        from threading import Thread
+        Thread(target=lambda x: x.run(), args=(StateGetTarget(hand, vector(-50, -215, 150), vector(0, -215, 100)),)).start()
 
 
     L = 600
@@ -80,7 +83,10 @@ if __name__ == '__main__':
     left = wx.Button(p, label=u'Безопасное положение', pos=(d + L, 300))
     left.Bind(wx.EVT_BUTTON, set_save_state)
     
-    
+    left = wx.Button(p, label=u'Анимация', pos=(d + L, 350))
+    left.Bind(wx.EVT_BUTTON, start_anim)
+
+
 
     #координаты
     x_arrow = arrow(pos=(0, 0, 0), axis=(1, 0, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=color.red)
@@ -156,5 +162,5 @@ if __name__ == '__main__':
         rate(30)
 
         if move_hand:
-            hand.calk_ik_pos(get_mouse_pos())
+            print  hand.calk_ik_pos(get_mouse_pos())
         #обновление состояний.
