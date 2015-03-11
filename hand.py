@@ -32,7 +32,6 @@ class Hand:
         self.b3_box = box(frame=self.b3, pos=(0, -10, 0), length=20, height=40, width=40)
         self.b3_box_2 = box(frame=self.b3, pos=(0, -76, 5.25), length=12, height=22, width=22.50)
         
-        
         self.b4 = Bone(frame=self.b3, pos=(0, -87, 0), freedom_y_angle=(0, math.pi))
         self.b4_box = box(frame=self.b4, pos=(0, -10, 0), length=10, height=20, width=10)
         
@@ -40,6 +39,8 @@ class Hand:
         
         self.end = self.b5
         self.last_time = time.time()
+
+        self.b2.add_target(vector(-100, -10, -50), vector(0, 0, 0), 0.01)
 
         self.cmd_queue = None
         #self.cmd_queue = Queue()
@@ -70,7 +71,16 @@ class Hand:
             self.cmd_queue.put(data)
 
     def calk_ik_pos(self, target):
-        self.end.calk_ik_pos(target)
+        #target = vector(-20,-30, -40)
+        #self.set_save_state()
+        #print "calk_ik_pos ->"
+        #self.end.calk_ik_pos(target)
+        #print "calk_ik_pos <-"
+
+        #self.set_save_state()
+        #print "calk_ik_pos_2 ->"
+        self.end.calk_ik_pos_2(((target, vector(0.0, 0.0, 0.0), 1.0), ))
+        #print "calk_ik_pos_2 <-"
 
 
         if self.cmd_queue is not None:

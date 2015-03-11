@@ -33,8 +33,8 @@ class Bone(MyFrame):
         self.z_arrow = arrow(frame=self, pos=(0, 0, 0), axis=(0, 0, 1), length=10, shaftwidth=1, fixedwidth = True, color=color.blue)
         self.set_visible_center(show_center)
     
-    def add_target(self, pos, weight):
-        self.targets.append((pos, weight))
+    def add_target(self, glob_pos, pos, weight):
+        self.targets.append((glob_pos, pos, weight))
 
     def set_visible_center(self, v):
         self.x_arrow.visible = v
@@ -121,17 +121,43 @@ class Bone(MyFrame):
                 offset_angle = freedom[1] - cur_angle
 
             self.rotate(angle=offset_angle, axis=rotate_axis)
+            
+    def calk_ik_on_plane_2(self, plane, base_axis, freedom, targets):
+        '''Рассчёт кинематики для оси'''
+        offset_angle = 0
+        
+        for target, end, weight in targets:
+            offset_angle += self.calk_ik_offset_angle(plane, base_axis, freedom, target, end) * weight
+
+        axis, up = plane
+        #текущий угол поворота в плоскости
+        cur_angle = self.get_proj_angle(axis, up, base_axis)
+        dest_angle = cur_angle + offset_angle
+
+        #меньше минимума
+        if dest_angle < freedom[0]:
+            offset_angle = freedom[0] - cur_angle
+        #больше максимума
+        elif dest_angle > freedom[1]:
+            offset_angle = freedom[1] - cur_angle
+
+        if offset_angle != 0.0:
+            rotate_axis = axis.cross(up)
+            self.rotate(angle=offset_angle, axis=rotate_axis)
 
 
     def calk_ik_offset_angle(self, plane, base_axis, freedom, target, end):
         '''Рассчёт рассчёт угла смещения для IK'''
+        if end.mag == 0:
+            return 0.0
+
         axis, up = plane
 
         #делаем проекцию end на плоскость
         pos_proj = axis * axis.dot(end) + up * up.dot(end)
 
         #проверяем возможность поворота.
-        if pos_proj.mag > 0:
+        if pos_proj.mag > 0.001:
             #делаем проекцию target на плоскость
             target_proj = axis * axis.dot(target) +  up * up.dot(target)
 
@@ -143,8 +169,42 @@ class Bone(MyFrame):
             if target_proj.dot(rotate_axis.cross(pos_proj)) < 0:
                 offset_angle = -offset_angle
             return offset_angle
+        return 0.0
+    
+    def calk_ik_pos_2(self, targets):
+        '''Рассчёт инверсной кинематики'''
+        #1. переведём в локальную систему координат
+        cur_targets = []
+
+        glob_targets = []
+        for glob_target, end, weight in targets:
+            glob_targets.append(glob_target)
+            cur_targets.append((self.world_to_frame(glob_target), end, weight))
+        
+        for glob_target, end, weight in self.targets:
+            glob_targets.append(glob_target)
+            cur_targets.append((self.world_to_frame(glob_target), end, weight))
+
+        #вращение по z
+        if self.freedom_z_angle is not None:
+            self.calk_ik_on_plane_2((vector(1, 0, 0), vector(0, 1, 0)), self.axis, self.freedom_z_angle, cur_targets)
+
+        #вращение по y
+        if self.freedom_y_angle is not None:
+            self.calk_ik_on_plane_2((vector(0, 0, 1), vector(1, 0, 0)), self.axis.cross(self.up), self.freedom_y_angle, cur_targets)
+
+        #вращение по x
+        if self.freedom_x_angle is not None:
+            self.calk_ik_on_plane_2((vector(0, 1, 0), vector(0, 0, 1)), self.up, self.freedom_x_angle, cur_targets)
+
+        #рассчитаем кинематику для родителя
+        if self.frame is not None and isinstance(self.frame, MyFrame):
+            data = [(g, self.frame.world_to_frame(self.frame_to_world(t[1])), t[2]) for g, t in zip(glob_targets, cur_targets)]
+            self.frame.calk_ik_pos_2(data)
+
+        return self.frame_to_world(end)
             
-    def calk_ik_pos(self, glob_target, end=vector(0, 0, 0), targets=None):
+    def calk_ik_pos(self, glob_target, end=vector(0, 0, 0)):
         '''Рассчёт инверсной кинематики'''
         #print "calk_ik_pos(calk_ik_pos:{})".format(glob_target)
 
