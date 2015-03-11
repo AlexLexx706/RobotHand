@@ -36,6 +36,11 @@ if __name__ == '__main__':
         '''Сдвиг губок захвата'''
         value = move_sponge_slider.GetValue()
         hand.set_sponge_value(value/180.*math.pi)
+        
+    def set_save_state(evt):
+        '''Установить в безопасное положение'''
+        hand.set_save_state()
+
 
 
     L = 600
@@ -72,6 +77,10 @@ if __name__ == '__main__':
     move_sponge_slider = wx.Slider(p, pos=(d + L, 230), size=(150, 30), minValue=0, maxValue=85)
     move_sponge_slider.Bind(wx.EVT_SCROLL, move_sponge)
 
+    left = wx.Button(p, label=u'Безопасное положение', pos=(d + L, 300))
+    left.Bind(wx.EVT_BUTTON, set_save_state)
+    
+    
 
     #координаты
     x_arrow = arrow(pos=(0, 0, 0), axis=(1, 0, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=color.red)

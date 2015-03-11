@@ -22,7 +22,7 @@ class Hand:
 
         self.base = Bone()
         self.base_box = box(pos=(95/2, 25, 0), length=95, height=75, width=75)
-        self.base_table = box(pos=(0, -218-5, 0), length=200, height=10, width=200)
+        self.base_table = box(pos=(0, -218-5, 0), length=400, height=10, width=400)
         
 
         self.b0 = Bone(frame=self.base, pos=(0, 0, 0), freedom_x_angle=(-65/180 *math.pi, math.pi / 2))
