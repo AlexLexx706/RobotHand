@@ -30,6 +30,7 @@ if __name__ == '__main__':
     def hand_rotate(evt):
         '''Вращение кисти'''
         value = hand_rotate_slider.GetValue()
+        print value
         hand.set_hand_angle(value / 180. * math.pi)
         
     def move_sponge(evt):
@@ -162,5 +163,5 @@ if __name__ == '__main__':
         rate(30)
 
         if move_hand:
-            print  hand.calk_ik_pos(get_mouse_pos())
+            hand.calk_ik_pos(get_mouse_pos())
         #обновление состояний.

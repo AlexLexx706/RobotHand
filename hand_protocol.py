@@ -18,7 +18,7 @@ class HandProtocol(protocol.Protocol):
                         [[-135 / 180. * math.pi, 543], [0 / 180. * math.pi, 2065], 2],
                         [[-150 / 180. * math.pi, 2500], [0 / 180. * math.pi, 804], 3],
                         [[0 / 180. * math.pi, 1000], [110 / 180. * math.pi, 2300], 4],
-                        [[-85 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870], 5],
+                        [[-105 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870], 5],
                         [[0 / 180. * math.pi, 1239], [85 / 180. * math.pi, 1913], 6]]
     
     def rotate(self, id, angle):

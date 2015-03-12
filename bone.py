@@ -227,6 +227,31 @@ class Bone(MyFrame):
         
         return self.frame_to_world(end)
 
+
+    def rotate_by_normal(self, plane, base_axis, freedom, global_normal):
+        '''Сориентировать звено по проекции плоскости'''
+        #1. преобразуем global_normal нормаль в локальную
+        if self.frame is not None and isinstance(self.frame, MyFrame):
+            normal = self.frame.world_to_frame(vector(0, 0, 0) + global_normal) - self.frame.world_to_frame(vector(0, 0, 0))
+        else:
+            normal = global_normal
+
+        #2. найдём cross нормалей
+        horizont = normal.cross(plane[0].cross(plane[1]))
+
+        #найдём угол горизонта
+        if horizont.mag > 0:
+            angle = self.get_proj_angle(plane[0], plane[1], horizont)
+            self.set_proj_angle(freedom, angle, plane[0], plane[1], base_axis)
+
+    def rotate_by_normal_y(self, global_normal=vector(0, 1, 0)):
+        self.rotate_by_normal((vector(0, 0, 1), vector(1, 0, 0)), self.axis.cross(self.up),
+                              self.freedom_y_angle, global_normal)
+
+
+
+
+
 ###############################################################################
 if __name__ == '__main__':
     import wx

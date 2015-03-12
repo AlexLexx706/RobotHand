@@ -45,14 +45,12 @@ class Hand:
         self.b4_sponge_l= box(frame=self.b4, pos=(0, -(50 + 55/2), 6/2), length=7, height=55, width=6)
         self.b4_sponge_r= box(frame=self.b4, pos=(0, -(50 + 55/2), -6/2), length=7, height=55, width=6)
         self.open_sponges()
-        time.sleep(3)
-        self.close_sponges()
 
         self.b5 = Bone(frame=self.b4, pos=(0, -105, 0))
         self.end = self.b5
         self.last_time = time.time()
 
-        self.b2.add_target(vector(-100, -10, -50), vector(0, 0, 0), 0.01)
+        #self.b2.add_target(vector(-100, -10, -50), vector(0, 0, 0), 0.01)
 
     
     def set_sponge_value(self, angle):
@@ -107,6 +105,8 @@ class Hand:
         self.b1.set_angle_z(-00 / 180. * math.pi)
         self.b2.set_angle_y(-90 / 180. * math.pi)
         self.b3.set_angle_z(150 / 180. * math.pi)
+        self.b4.set_angle_y(0 / 180. * math.pi)
+        self.open_sponges()
 
         if self.cmd_queue is not None:
             data = (self.b0.get_angle_x(),
@@ -123,11 +123,14 @@ class Hand:
         for i in range(count):
             pos = self.end.calk_ik_pos_2(((target, vector(0.0, 0.0, 0.0), 1.0), ))
 
+        #с ориентируем клешню параллельно полу.
+        self.b4.rotate_by_normal_y()
+
         if self.cmd_queue is not None:
             ct = time.time()
             dt = ct - self.last_time
 
-            if dt > 0.1:
+            if dt > 0.05:
                 data = [self.b0.get_angle_x(),
                         self.b1.get_angle_z(),
                         self.b2.get_angle_y(),
@@ -136,6 +139,12 @@ class Hand:
                         self.sponge_angle]
                 self.last_time = ct
                 self.cmd_queue.put((1, data))
+        print "0: {} 1: {} 2: {} 3: {} 4: {} 5: {}".format(self.b0.get_angle_x(),
+                                                           self.b1.get_angle_z(),
+                                                           self.b2.get_angle_y(),
+                                                           self.b3.get_angle_z(),
+                                                           self.b4.get_angle_y(),
+                                                           self.sponge_angle)
         return pos
     
     def get_target_pos(self):
@@ -146,20 +155,14 @@ class Hand:
         '''Вращать руку'''
         self.b4.set_angle_y(angle)
 
+        if self.cmd_queue is not None:
+            self.cmd_queue.put((0, (4, angle)))
+
     def get_hand_angle(self, angle):
         '''Вращать руку'''
         return self.b4.get_angle_y()
 
-# class State:
-#     def __init__(self, *args, **kwargs):
-#         '''Состояние'''
-#         pass
-#
-#     def run(self):
-#         pass
-#
-#     def next_state(self):
-#         pass
+
 
 class StateGetTarget:
     def __init__(self, hand, target, new_target_pos):
@@ -175,7 +178,7 @@ class StateGetTarget:
         time.sleep(1)
 
         #2) переместим схват над целью
-        self.hand.calk_ik_pos(self.target + vector(0,50,0), count=10)
+        self.hand.calk_ik_pos(self.target + vector(0,80,0), count=10)
         time.sleep(1)
 
 
@@ -185,15 +188,15 @@ class StateGetTarget:
 
 
         #3) Сожмём схват
-        self.hand.set_sponge_value(40/180*math.pi)
+        self.hand.set_sponge_value(20/180*math.pi)
         time.sleep(1)
 
         #4) поднять над позицией на безопасное раасстояние
-        self.hand.calk_ik_pos(self.target + vector(0,50,0), count=10)
+        self.hand.calk_ik_pos(self.target + vector(0,80,0), count=10)
         time.sleep(1)
 
         #5) преренесём на новую позицию
-        self.hand.calk_ik_pos(self.new_target_pos + vector(0,50,0), count=10)
+        self.hand.calk_ik_pos(self.new_target_pos + vector(0,80,0), count=10)
         time.sleep(1)
 
         self.hand.calk_ik_pos(self.new_target_pos, count=10)
@@ -202,7 +205,7 @@ class StateGetTarget:
         self.hand.open_sponges()
         time.sleep(1)
 
-        self.hand.calk_ik_pos(self.new_target_pos + vector(0,50,0), count=10)
+        self.hand.calk_ik_pos(self.new_target_pos + vector(0,80,0), count=10)
         time.sleep(1)
 
 
