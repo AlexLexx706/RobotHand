@@ -84,7 +84,7 @@ class Hand:
 
     def proto_proc(self):
         '''Обработка комманд'''
-        from hand_protocol import HandProtocol
+        from protocol.hand_protocol import HandProtocol
 
         proto = HandProtocol(port="COM27", baudrate=128000)
 
