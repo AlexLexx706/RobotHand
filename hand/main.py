@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import division
-    
-if __name__ == '__main__':
-    from hand import Hand, StateGetTarget
-    from visual import * 
-    import wx
-    import time
+from hand import Hand, StateGetTarget
+from visual import * 
+import wx
+import time
 
+#переменные для управления
+move_camera = False
+mouse_down = False
+camera_pos = None
+move_hand = False
+target_pos = vector(0,0,0)
+
+    
+def main():
     def get_mouse_pos():
         '''Получить положение курсора в пространстве'''
         choice = radio_box.GetSelection()
@@ -97,14 +104,6 @@ if __name__ == '__main__':
     #создадим руку
     hand = Hand()
     hand.set_save_state()
-
-    #переменные для управления
-    move_camera = False
-    mouse_down = False
-    camera_pos = None
-    move_hand = False
-    target_pos = vector(0,0,0)
-
     scene.autoscale = 0
     key_masks = {}
     selected_obj = None
@@ -165,3 +164,6 @@ if __name__ == '__main__':
         if move_hand:
             hand.calk_ik_pos(get_mouse_pos())
         #обновление состояний.
+
+if __name__ == '__main__':
+    main()

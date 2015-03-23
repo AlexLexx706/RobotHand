@@ -7,15 +7,15 @@ from servo_control import ServoControl
 from create_servo_dialog import CreateServoDialog
 import json
 import sys
-sys.path.append("..")
-from protocol.hand_protocol import HandProtocol
+import logging
 
+logger = logging.getLogger(__name__)
 
-class ServosSettings(QtGui.QFrame):
-    def __init__(self, parent=None):
-        super(QtGui.QFrame, self).__init__(parent)
+class ServosSettings(QtGui.QGroupBox):
+    def __init__(self, parent=None, settings=QtCore.QSettings("AlexLexx", "robot_hand")):
+        super(QtGui.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)[0], "servos_settings.ui"), self)
-        self.settings = QtCore.QSettings("AlexLexx", "robot_hand")
+        self.settings = settings
         self.scrollArea.addAction(self.action_add_servo)
         self.controlls = []
 
@@ -37,7 +37,7 @@ class ServosSettings(QtGui.QFrame):
             self.add_control(dialog.get_id(), None)
 
     def add_control(self, index, settings):
-            controll = ServoControl(index)
+            controll = ServoControl(index, self.settings)
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
             self.verticalLayout.insertWidget(self.verticalLayout.count()-1, controll)
@@ -54,21 +54,13 @@ class ServosSettings(QtGui.QFrame):
         self.settings.remove("")
         self.settings.endGroup()
 
-    @pyqtSlot('int')
-    def on_spinBox_port_valueChanged(self, value):
-        self.settings.setValue("port", value)
-    
-    @pyqtSlot('bool')
-    def on_pushButton_connect_clicked(self, v):
-        pass
-    
     @pyqtSlot('bool')
     def on_pushButton_save_settings_clicked(self, v):
         file_name = QtGui.QFileDialog.getSaveFileName(self, u"Сохраним файл",
                     self.settings.value("last_file").toString(), "Settings (*.json)")
         
         if len(file_name):
-            self.setWindowTitle(file_name)
+            self.lineEdit_file.setText(file_name)
             self.settings.setValue("last_file", file_name)
             open(file_name, "wb").write(json.dumps([c.get_settings() for c in self.controlls]))
 
@@ -81,15 +73,17 @@ class ServosSettings(QtGui.QFrame):
 
     def open_settings(self, file_name):
         if len(file_name):
-            self.setWindowTitle(file_name)
+            self.lineEdit_file.setText(file_name)
             self.settings.setValue("last_file", file_name)
 
             #чистим контролы
             while len(self.controlls):
                 self.remove_control(self.controlls[0])
-            
-            for settings in json.loads(open(file_name, "rb").read()):
-                self.add_control(settings[2], settings)
+            try:
+                for settings in json.loads(open(file_name, "rb").read()):
+                    self.add_control(settings[2], settings)
+            except IOError as e:
+                logger.warning(e)
    
 if __name__ == '__main__':
     import sys

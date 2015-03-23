@@ -10,10 +10,10 @@ class ServoControl(QtGui.QGroupBox):
     angle_changed = pyqtSignal(int, int)
     remove_control = pyqtSignal(object)
     
-    def __init__(self, index, parent=None):
+    def __init__(self, index, settings=QtCore.QSettings("AlexLexx", "robot_hand"), parent=None):
         super(QtGui.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)[0], "servo_control.ui"), self)
-        self.settings = QtCore.QSettings("AlexLexx", "robot_hand")
+        self.settings = settings
         self.index = index
         self.setTitle("ID:{}".format(index))
         self.addAction(self.action_remove)
