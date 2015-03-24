@@ -204,6 +204,9 @@ class GLWidget(QtOpenGL.QGLWidget):
         timer.timeout.connect(self.update)
         timer.start(20)
 
+    def sizeHint(self):
+        return QtCore.QSize(1024, 768)
+
     def __del__(self):
         self.makeCurrent()
 
