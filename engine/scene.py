@@ -3,6 +3,9 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
+import numpy as np
+from numpy import array as vector
+import math
 
 
 class SphereShape():
@@ -108,14 +111,17 @@ class BoxShape():
         glColor(self.color)
         glCallList(self.list_id)
 
-class Item():
+class Frame():
     center_list_id = None
 
-    def __init__(self, pos=[0.0, 0.0, 0.0], angles=[0.0, 0.0, 0.0], parent=None, shape=None):
+    def __init__(self, parent=None, pos=[0.0, 0.0, 0.0], angles=[0.0, 0.0, 0.0], shapes=[]):
         self.angles = angles
         self.pos = pos
         self.show_center = True
-        self.shape = shape
+        self.shapes = shapes
+        self.parent = parent
+        self.childs = []
+        self.update_matrix()
 
         #инициализация центра.
         if self.center_list_id is None:
@@ -137,38 +143,113 @@ class Item():
             glEnd()
             glEndList()
 
-    def update(self):
-        glPushMatrix()
-        self.angles[0] += 0.1
-        self.angles[1] += 1
-        glTranslatef(self.pos[0], self.pos[1], self.pos[2]);
-        glRotated(self.angles[0], 1.0, 0.0, 0.0)
-        glRotated(self.angles[1], 0.0, 1.0, 0.0)
-        glRotated(self.angles[2], 0.0, 0.0, 1.0)
+    def set_pos(self, pos):
+        if pos != self.pos:
+            self.pos = pos
+            self.update_matrix()
 
+    def get_pos(self):
+        return self.pos
+
+    def set_angles(self, angles):
+        if self.angles != angles:
+            self.angles = angles
+            self.update_matrix()
+
+    def get_angles(self):
+        return self.angles
+
+    def set_glob_pos(self, pos):
+        if self.parent is None:
+            self.set_pos(pos)
+        else:
+            m = self.parent.matrix
+            v = pos - m[3][:3]
+            self.set_pos(m.transpose().dot(vector([v[0], v[1], v[2], 0]))[:3])
+
+    def get_glob_pos(self):
+        return self.matrix[3][:3]
+
+    def get_glob_angle(self):
+        return (-math.arctan2(self.matrix[2][1], self.matrix[2][2]),
+                math.arcsin(self.matrix[2][0]),
+                -math.arctan2(self.matrix[1][0], self.matrix[0][0]))
+
+    def set_glob_angle(self, angles):
+        self.set_angles(angles)
+
+    def update_matrix(self):
+        glPushMatrix()
+
+        if self.parent:
+            glLoadMatrixd(self.parent.matrix)
+            glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+            glRotated(self.angles[0], 1.0, 0.0, 0.0)
+            glRotated(self.angles[1], 0.0, 1.0, 0.0)
+            glRotated(self.angles[2], 0.0, 0.0, 1.0)
+            self.matrix = glGetFloatv(GL_MODELVIEW_MATRIX)
+        else:
+            glLoadIdentity()
+            glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+            glRotated(self.angles[0], 1.0, 0.0, 0.0)
+            glRotated(self.angles[1], 0.0, 1.0, 0.0)
+            glRotated(self.angles[2], 0.0, 0.0, 1.0)
+            self.matrix = glGetFloatv(GL_MODELVIEW_MATRIX)
+
+        #обновка у чилдренов
+        for ch in self.childs:
+            ch.update_matrix()
+
+        glPopMatrix()
+
+    def make_alone(self):
+        if self.parent is None:
+            return
+
+        angle = self.get_glob_angle()
+        pos = self.get_glob_pos()
+        self.parent.childs.remove(self)
+        self.parent = None
+        self.set_pos(pos)
+        self.set_alone(angle)
+
+    def add_child(self, child):
+        if child not in self.childs:
+            child.make_alone()
+            self.childs.append(child)
+            child.parent = self
+
+    def update(self):
+        self.angles[1] += 1
+        self.update_matrix()
+        glPushMatrix()
+        glLoadMatrixf(self.matrix)
         self.draw()
         glPopMatrix()
+
 
     def draw(self):
         if self.show_center:
             glCallList(self.center_list_id)
 
-        if self.shape is not None:
-            self.shape.draw()
+        for shape in self.shapes:
+            shape.draw()
 
 class Scene():
     def __init__(self):
-        self.items = []
+        self.frames = []
     
-    def add_item(self, item):
-        self.items.append(item)
+    def add_frame(self, frame):
+        self.frames.append(frame)
     
     def update(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
 
-        for item in self.items:
-            item.update()
-    
+        for frame in self.frames:
+            frame.update()
+
     def initializeGL(self):
         lightPos = (5.0, 5.0, 10.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
@@ -192,10 +273,10 @@ class Scene():
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 60.0)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        glTranslated(0.0, 0.0, -55.0)
+        glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 1000.0)
+        glTranslated(0.0, -10.0, -100.0)
+        glRotate(20, 1, 0, 0)
+
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
@@ -214,8 +295,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         glutInit(sys.argv)
         self.scene = Scene()
         self.scene.initializeGL()
-        self.scene.add_item(Item(shape=CylinderShape(radius=5, color=(0.0, 0.5, 0.0))))
-        self.scene.add_item(Item(pos=[-10,0,0], shape=BoxShape()))
+        frame_1 = Frame(pos=[0,0,0], shapes=[BoxShape(),])
+        self.scene.add_frame(frame_1)
+
+        self.scene.add_frame(Frame(parent=frame_1, pos=[10, 0, -20], angles=[0, 0.0, 0.0],
+                                 shapes=[CylinderShape(radius=5, color=(0.0, 0.5, 0.0)),] ))
 
     def paintGL(self):
         self.scene.update()
