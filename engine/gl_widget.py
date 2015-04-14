@@ -8,6 +8,7 @@ from box import box
 from sphere import sphere
 from scene import Scene
 from cylinder import cylinder
+from hand import Hand
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
@@ -39,8 +40,6 @@ class GLWidget(QtOpenGL.QGLWidget):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainWin = GLWidget()
-    #cylinder(axis=(10.0, 2,0))
-    box(axis=(10.0, 2,0))
     mainWin.show()
     sys.exit(app.exec_())    
 

@@ -2,6 +2,11 @@
 import numpy as np
 from scene import Scene
 
+def vector(*args):
+    res = np.array(args, float)
+    res.resize(3)
+    return res
+
 class MyFrame:
     '''Класс фрейм с корректными методами frame_to_world и world_to_frame'''
     def __init__(self, **kwargs):
@@ -39,7 +44,6 @@ class MyFrame:
         
         self.scene = Scene.GetCurScene()
         self.scene.frames.append(self)
-        print self.scene.frames
         self.childs = []
         
         if self.frame is not None:
@@ -78,6 +82,9 @@ class MyFrame:
         return np.dot(m.T, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
     
     def update(self):
+        pass
+    
+    def first_make(self):
         pass
 
 if __name__ == "__main__":

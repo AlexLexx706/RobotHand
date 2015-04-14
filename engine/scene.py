@@ -29,7 +29,7 @@ class Scene():
             frame.update()
 
     def initializeGL(self):
-        lightPos = (5.0, 5.0, 10.0, 1.0)
+        lightPos = (200, 0.0, 2000.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
@@ -54,8 +54,8 @@ class Scene():
 
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 1000.0)
-        glTranslated(0.0, -10.0, -100.0)
+        glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 10000.0)
+        glTranslated(-200.0, 0.0, -2000.0)
         glRotate(20, 1, 0, 0)
 
         

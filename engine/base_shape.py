@@ -12,6 +12,7 @@ class base_shape(MyFrame):
         MyFrame.__init__(self, **kwargs)
         self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)       
         self.list_id = None
+        self.visible = True
     
     def first_make(self):
         self.list_id = glGenLists(1)    
@@ -26,9 +27,10 @@ class base_shape(MyFrame):
         MyFrame.__del__(self)
 
     def update(self):
-        glLoadMatrixd(self.get_matrix().T)
-        glColor(self.color)
-        glCallList(self.list_id)
+        if self.visible:
+            glLoadMatrixd(self.get_matrix().T)
+            glColor(self.color)
+            glCallList(self.list_id)
 
 if __name__ == '__main__':
     base_shape()
