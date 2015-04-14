@@ -16,9 +16,11 @@ class Scene():
 
     def __init__(self):
         self.frames = []
-
         if Scene.CUR_SCENE is None:
             Scene.CUR_SCENE = self
+        
+        from camera import camera
+        self.camera = camera(pos=(200, 0, 2000), center=(0,0,0))
     
     def update(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -27,6 +29,7 @@ class Scene():
 
         for frame in self.frames:
             frame.update()
+            
 
     def initializeGL(self):
         lightPos = (200, 0.0, 2000.0, 1.0)
@@ -43,6 +46,8 @@ class Scene():
         
         for f in self.frames:
             f.first_make()
+        
+        self.camera.update_camera()
 
     def resizeGL(self, width, height):
         side = min(width, height)
@@ -52,10 +57,5 @@ class Scene():
 
         glViewport((width - side) / 2, (height - side) / 2, side, side)
 
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 10000.0)
-        glTranslated(-200.0, 0.0, -2000.0)
-        glRotate(20, 1, 0, 0)
 
         

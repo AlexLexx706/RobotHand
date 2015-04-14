@@ -61,16 +61,16 @@ class MyFrame:
         u'''Возвращает матрицу фрейма'''
         #найдём все фреймы.
         grob_matrix = np.identity(4)
-        grob_matrix[:3,0] = self.axis
-        grob_matrix[:3,1] = self.up
-        grob_matrix[:3,2] = np.cross(self.axis, self.up)
-        grob_matrix[:3,3] = self.pos
+        grob_matrix[0,:3] = self.axis
+        grob_matrix[1,:3] = self.up
+        grob_matrix[2,:3] = np.cross(self.axis, self.up)
+        grob_matrix[3,:3] = self.pos
      
         if self.frame is None:
             return grob_matrix
 
         return np.dot(self.frame.get_matrix(), grob_matrix)
-    
+
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''
         return np.dot(self.get_matrix(), np.array((frame_pos[0], frame_pos[1], frame_pos[2], 1.0)))[:3]
@@ -78,8 +78,8 @@ class MyFrame:
     def world_to_frame(self, world_pos):
         u'''Преобразует глобальные координаты world_pos в локальные координаты фрейма'''
         m = self.get_matrix()
-        pos = np.array(world_pos) - m[:3,3]
-        return np.dot(m.T, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
+        pos = np.array(world_pos) - m[3]
+        return np.dot(m, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
     
     def update(self):
         pass
