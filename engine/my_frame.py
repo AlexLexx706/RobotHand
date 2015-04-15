@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from scene import Scene
+import transformations
 
 def vector(*args):
     res = np.array(args, float)
@@ -31,8 +32,6 @@ class MyFrame:
         self.axis /= self.axis_len
         self.up /= np.linalg.norm(self.up)
         
-        
-        
         if "x" in kwargs:
             self.pos[0] = kwargs[0]
         
@@ -61,10 +60,10 @@ class MyFrame:
         u'''Возвращает матрицу фрейма'''
         #найдём все фреймы.
         grob_matrix = np.identity(4)
-        grob_matrix[0,:3] = self.axis
-        grob_matrix[1,:3] = self.up
-        grob_matrix[2,:3] = np.cross(self.axis, self.up)
-        grob_matrix[3,:3] = self.pos
+        grob_matrix[:3, 0] = self.axis
+        grob_matrix[:3, 1] = self.up
+        grob_matrix[:3, 2] = np.cross(self.axis, self.up)
+        grob_matrix[:3, 3] = self.pos
      
         if self.frame is None:
             return grob_matrix
@@ -81,6 +80,18 @@ class MyFrame:
         pos = np.array(world_pos) - m[3]
         return np.dot(m, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
     
+    def rotate(self, angle, direction, point=None):
+        m = np.identity(4)
+        m[:3, 0] = self.axis
+        m[:3, 1] = self.up
+        m[:3, 2] = np.cross(self.axis, self.up)
+        m[:3, 3] = self.pos
+        r_m = transformations.rotation_matrix(angle, direction, point)
+        n_m = r_m.dot(m)
+        self.axis = n_m[:3, 0]
+        self.up = n_m[:3, 1]
+        self.pos = n_m[:3, 3]
+
     def update(self):
         pass
     

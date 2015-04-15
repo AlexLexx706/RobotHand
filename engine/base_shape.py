@@ -28,7 +28,7 @@ class base_shape(MyFrame):
 
     def update(self):
         if self.visible:
-            glLoadMatrixd(self.get_matrix())
+            glLoadMatrixd(self.get_matrix().T)
             glColor(self.color)
             glCallList(self.list_id)
 

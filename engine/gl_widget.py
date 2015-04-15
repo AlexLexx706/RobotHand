@@ -4,11 +4,11 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
+from my_frame import *
 from box import box
 from sphere import sphere
 from scene import Scene
 from cylinder import cylinder
-from hand import Hand
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
@@ -16,6 +16,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update)
         timer.start(20)
+        self.sphere = sphere(radius=20)
+        
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -35,8 +37,17 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.scene.resizeGL(width, height)
 
     def update(self):
-        self.updateGL()    
-
+        self.updateGL()
+        #self.sphere.rotate(0.1, vector(1,0,0))
+    
+    def mousePressEvent(self, event):
+        pos = event.pos()
+        self.sphere.pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), vector(0,0,1), vector(0,0,0))
+        #self.sphere.pos = self.scene.camera.get_pos(pos.x(), pos.y())
+        print self.sphere.pos
+        #self.scene.camera.rotate(0.05, vector(0, 1, 0), vector(0, 0, 0))
+        
+    
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainWin = GLWidget()

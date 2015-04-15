@@ -20,7 +20,7 @@ class Scene():
             Scene.CUR_SCENE = self
         
         from camera import camera
-        self.camera = camera(pos=(200, 0, 2000), center=(0,0,0))
+        self.camera = camera()
     
     def update(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -29,7 +29,8 @@ class Scene():
 
         for frame in self.frames:
             frame.update()
-            
+        
+        self.camera.update_camera()            
 
     def initializeGL(self):
         lightPos = (200, 0.0, 2000.0, 1.0)
@@ -47,8 +48,6 @@ class Scene():
         for f in self.frames:
             f.first_make()
         
-        self.camera.update_camera()
-
     def resizeGL(self, width, height):
         side = min(width, height)
 
