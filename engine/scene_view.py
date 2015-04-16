@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui, QtOpenGL
 from OpenGL.GL import *
-from OpenGL.GLUT import *
 from OpenGL.GLU import *
-import numpy as np
-from visual_common.cvisual import vector
-from box import box
+from OpenGL.GLUT import *
+from PyQt4.QtCore import pyqtSlot, pyqtSignal
 from sphere import sphere
 from scene import Scene
-from cylinder import cylinder
-from hand import Hand
 
-class GLWidget(QtOpenGL.QGLWidget):
+class SceneView(QtOpenGL.QGLWidget):
+    #движение курсора
+    cursor_move = pyqtSignal(object, object)
+    
     def __init__(self, parent=None):
-        super(GLWidget, self).__init__(parent)
+        QtOpenGL.QGLWidget.__init__(self, parent)
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update)
         timer.start(20)
-        self.sphere = sphere(radius=20)
         self.scale_camera = False
         self.rotate_camera = False
         self.move_cursor = False
         self.old_cursore_pos = None
-        self.hand = Hand()
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -53,8 +50,7 @@ class GLWidget(QtOpenGL.QGLWidget):
             offset = event.pos() - self.old_cursore_pos
             self.scene.camera.rotate_camera(-offset.x()*0.001, -offset.y()*0.001)
         elif self.move_cursor:
-            pos = event.pos()
-            #self.hand.calk_ik_pos(self.scene.camera.get_point_on_plain(pos.x(), pos.y(), self.scene.camera.get_plain()))
+            self.cursor_move.emit(self.scene.camera, event.pos())
         self.old_cursore_pos = event.pos()
     
     def mouseReleaseEvent(self, event):
@@ -65,30 +61,17 @@ class GLWidget(QtOpenGL.QGLWidget):
         elif QtCore.Qt.LeftButton == event.button():
             self.move_cursor = False
 
-
     def mousePressEvent(self, event):
         self.old_cursore_pos = event.pos()
 
-        #������� ������
+        #средняя кнопка
         if QtCore.Qt.MidButton == event.button():
             self.scale_camera = True
         elif QtCore.Qt.RightButton == event.button():
             self.rotate_camera = True
         elif QtCore.Qt.LeftButton == event.button():
             self.move_cursor = True
-            pos = event.pos()
-            #self.sphere.pos = self.scene.camera.get_pos(pos.x(), pos.y())
-            pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), self.scene.camera.get_plain())
-            print pos
-            self.hand.calk_ik_pos(pos)
-
-            
-        #pos = event.pos()
-        #self.sphere.pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), vector(0,0,1), vector(0,0,0))
-        #self.sphere.pos = self.scene.camera.get_pos(pos.x(), pos.y())
-        #print self.sphere.pos
-        #self.scene.camera.rotate(0.05, vector(0, 1, 0), vector(0, 0, 0))
-        
+            self.cursor_move.emit(self.scene.camera, event.pos())
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

@@ -5,4 +5,5 @@ from cylinder import *
 from sphere import *
 from scene import *
 from my_frame import *
-from gl_widget import *
+from vector import *
+from scene_view import *

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtCore, QtGui, QtOpenGL
 from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
-import numpy as np
 
 class Scene():
     CUR_SCENE = None
@@ -11,7 +7,7 @@ class Scene():
     @staticmethod
     def GetCurScene():
         if Scene.CUR_SCENE is None:
-            return Scene()
+            Scene.CUR_SCENE = Scene()
         return Scene.CUR_SCENE
 
     def __init__(self):

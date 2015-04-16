@@ -6,7 +6,6 @@ from Queue import Queue
 import time
 import math
 
-
 class Hand:
     '''Рука'''
     def __init__(self):
@@ -208,10 +207,11 @@ class StateGetTarget:
         time.sleep(1)
 
 if __name__ == '__main__':
-    from PyQt4 import QtCore, QtGui, QtOpenGL
+    from PyQt4 import QtGui
+    from engine.scene_view import SceneView
     import sys
     app = QtGui.QApplication(sys.argv)
-    mainWin = GLWidget()
+    mainWin = SceneView()
     h = Hand()
     mainWin.show()
     sys.exit(app.exec_())    

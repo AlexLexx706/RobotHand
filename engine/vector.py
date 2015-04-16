@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import numpy as np
 import scipy.linalg
 import math
-
 
 def mag(A):
     return np.linalg.norm(A)
@@ -70,6 +70,8 @@ class vector(np.ndarray):
         raise AttributeError()
     
     def norm(self):
+        if self.mag == 0:
+            raise RuntimeError()
         self /= self.mag
         return self
 
@@ -107,16 +109,16 @@ if __name__ == "__main__":
     print type(rotate(vector(1,0,0), 1, vector(0,1,0)))
     print type(astuple(vector(1,0,0)))
     
-    print vector(2,0,0).mag
-    print vector(2,0,0).mag2
-    print vector(2,0,0).norm()
-    print vector(1,0,0).dot(vector(0.3,1,0))
+    from visual_common.cvisual import vector as v_vector
+    print vector(2,0,0).mag, v_vector(2,0,0).mag
+    print vector(2,0,0).mag2, v_vector(2,0,0).mag2
+    print vector(2,0,0).norm(), v_vector(2,0,0).norm()
+    print vector(1,0,0).dot(vector(0.3,1,0)), v_vector(1,0,0).dot(vector(0.3,1,0))
     
-    print vector(1,0,0).cross(vector(0.3,1,0))
-    print vector(1,0,0).proj(vector(0.3,1,0))
-    print vector(1,0,0).comp(vector(0.3,1,0))
-    print vector(1,0,0).diff_angle(vector(-1,1,0))
-    print vector(1,0,0).rotate(1, vector(0,1,0))
-    print vector(1,0,0).astuple()
-    
-    
+    print vector(1,0,0).cross(vector(0.3,1,0)), v_vector(1,0,0).cross(vector(0.3,1,0))
+    print vector(1,0,0).proj(vector(0.3,1,0)),  v_vector(1,0,0).proj(vector(0.3,1,0))
+    print vector(1,0,0).comp(vector(0.3,1,0)), v_vector(1,0,0).comp(v_vector(0.3,1,0))
+    print vector(1,0,0).diff_angle(vector(-1,1,0)), v_vector(1,0,0).diff_angle(vector(-1,1,0))
+    print vector(1,0,0).rotate(1, vector(0,1,0)), v_vector(1,0,0).rotate(1, v_vector(0,1,0))
+    print vector(1,0,0).astuple(), v_vector(1,0,0).astuple()
+ 

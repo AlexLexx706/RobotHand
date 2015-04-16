@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
-from __future__ import division
-from my_frame import *
+from my_frame import MyFrame
+from vector import *
 from box import box as arrow
 
 

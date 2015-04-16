@@ -2,11 +2,7 @@
 import numpy as np
 from scene import Scene
 import transformations
-
-def vector(*args):
-    res = np.array(args, float)
-    res.resize(3)
-    return res
+from vector import *
 
 class MyFrame:
     '''Класс фрейм с корректными методами frame_to_world и world_to_frame'''
@@ -20,17 +16,25 @@ class MyFrame:
         up  - орт y
         '''
         self.frame = kwargs["frame"] if "frame" in kwargs else None
-        self.pos = np.array((0.0, 0.0, 0.0)) if "pos" not in kwargs else np.array(kwargs["pos"])
-        self.axis = np.array((1.0, 0.0, 0.0)) if "axis" not in kwargs else np.array(kwargs["axis"])
-        self.up = np.array((0.0, 1.0, 0.0)) if "up" not in kwargs else np.array(kwargs["up"])
-        
-        self.axis_len = np.linalg.norm(self.axis)
-        self.up_len = np.linalg.norm(self.up)
+        self.pos = vector(0.0, 0.0, 0.0) if "pos" not in kwargs else vector(kwargs["pos"])
+        self.axis = vector(1.0, 0.0, 0.0) if "axis" not in kwargs else vector(kwargs["axis"])
+         
+        #проверка up
+        if "up" not in kwargs:
+            self.up_len = 1.0
+            self.up = vector(self.axis).cross(vector(0,1,0)).cross(self.axis)
+
+            if self.up.mag == 0:
+                self.up = vector(-1,0,0)
+        else:
+            self.up = self.axis.cross(vector(kwargs["up"])).cross(self.axis)
+            self.up_len = self.up.mag
+
+        self.axis_len = self.axis.mag
 
         #нормализация
-        self.up = np.cross(np.cross(self.axis, self.up), self.axis)
-        self.axis /= self.axis_len
-        self.up /= np.linalg.norm(self.up)
+        self.axis.norm()
+        self.up.norm()
         
         if "x" in kwargs:
             self.pos[0] = kwargs[0]
@@ -62,7 +66,7 @@ class MyFrame:
         grob_matrix = np.identity(4)
         grob_matrix[:3, 0] = self.axis
         grob_matrix[:3, 1] = self.up
-        grob_matrix[:3, 2] = np.cross(self.axis, self.up)
+        grob_matrix[:3, 2] = self.axis.cross(self.up)
         grob_matrix[:3, 3] = self.pos
      
         if self.frame is None:
@@ -72,25 +76,25 @@ class MyFrame:
 
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''
-        return np.dot(self.get_matrix(), np.array((frame_pos[0], frame_pos[1], frame_pos[2], 1.0)))[:3]
+        return vector(self.get_matrix().dot(np.array((frame_pos[0], frame_pos[1], frame_pos[2], 1.0)))[:3])
 
     def world_to_frame(self, world_pos):
         u'''Преобразует глобальные координаты world_pos в локальные координаты фрейма'''
         m = self.get_matrix()
-        pos = np.array(world_pos) - m[:3, 3]
-        return np.dot(m, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
+        pos = vector(world_pos) - m[:3, 3]
+        return vector(m.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
     
-    def rotate(self, angle, direction, point=None):
+    def rotate(self, angle, axis, point=None):
         m = np.identity(4)
         m[:3, 0] = self.axis
         m[:3, 1] = self.up
-        m[:3, 2] = np.cross(self.axis, self.up)
+        m[:3, 2] = self.axis.cross(self.up)
         m[:3, 3] = self.pos
-        r_m = transformations.rotation_matrix(angle, direction, point)
+        r_m = transformations.rotation_matrix(angle, axis, point)
         n_m = r_m.dot(m)
-        self.axis = n_m[:3, 0]
-        self.up = n_m[:3, 1]
-        self.pos = n_m[:3, 3]
+        self.axis = vector(n_m[:3, 0])
+        self.up = vector(n_m[:3, 1])
+        self.pos = vector(n_m[:3, 3])
 
     def update(self):
         pass
@@ -104,7 +108,7 @@ if __name__ == "__main__":
     print f.up
     print f.axis
     print f.get_matrix()
-    print f.frame_to_world(np.array((1,2,3)))
+    print f.frame_to_world(vector((1,2,3)))
     print f.world_to_frame((12,12,23))
     
     
