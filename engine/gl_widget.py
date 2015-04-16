@@ -4,11 +4,12 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
-from my_frame import *
+from visual_common.cvisual import vector
 from box import box
 from sphere import sphere
 from scene import Scene
 from cylinder import cylinder
+from hand import Hand
 
 class GLWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent=None):
@@ -17,7 +18,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         timer.timeout.connect(self.update)
         timer.start(20)
         self.sphere = sphere(radius=20)
-        
+        self.scale_camera = False
+        self.rotate_camera = False
+        self.move_cursor = False
+        self.old_cursore_pos = None
+        self.hand = Hand()
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -40,11 +45,48 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.updateGL()
         #self.sphere.rotate(0.1, vector(1,0,0))
     
+    def mouseMoveEvent(self, event):
+        if self.scale_camera:
+            offset = (event.pos() - self.old_cursore_pos).y()
+            self.scene.camera.move_eye(offset*2)
+        elif self.rotate_camera:
+            offset = event.pos() - self.old_cursore_pos
+            self.scene.camera.rotate_camera(-offset.x()*0.001, -offset.y()*0.001)
+        elif self.move_cursor:
+            pos = event.pos()
+            #self.hand.calk_ik_pos(self.scene.camera.get_point_on_plain(pos.x(), pos.y(), self.scene.camera.get_plain()))
+        self.old_cursore_pos = event.pos()
+    
+    def mouseReleaseEvent(self, event):
+        if QtCore.Qt.MidButton == event.button():
+            self.scale_camera = False
+        elif QtCore.Qt.RightButton == event.button():
+            self.rotate_camera = False
+        elif QtCore.Qt.LeftButton == event.button():
+            self.move_cursor = False
+
+
     def mousePressEvent(self, event):
-        pos = event.pos()
-        self.sphere.pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), vector(0,0,1), vector(0,0,0))
+        self.old_cursore_pos = event.pos()
+
+        #средн€€ кнопка
+        if QtCore.Qt.MidButton == event.button():
+            self.scale_camera = True
+        elif QtCore.Qt.RightButton == event.button():
+            self.rotate_camera = True
+        elif QtCore.Qt.LeftButton == event.button():
+            self.move_cursor = True
+            pos = event.pos()
+            #self.sphere.pos = self.scene.camera.get_pos(pos.x(), pos.y())
+            pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), self.scene.camera.get_plain())
+            print pos
+            self.hand.calk_ik_pos(pos)
+
+            
+        #pos = event.pos()
+        #self.sphere.pos = self.scene.camera.get_point_on_plain(pos.x(), pos.y(), vector(0,0,1), vector(0,0,0))
         #self.sphere.pos = self.scene.camera.get_pos(pos.x(), pos.y())
-        print self.sphere.pos
+        #print self.sphere.pos
         #self.scene.camera.rotate(0.05, vector(0, 1, 0), vector(0, 0, 0))
         
     

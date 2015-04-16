@@ -77,7 +77,7 @@ class MyFrame:
     def world_to_frame(self, world_pos):
         u'''Преобразует глобальные координаты world_pos в локальные координаты фрейма'''
         m = self.get_matrix()
-        pos = np.array(world_pos) - m[3]
+        pos = np.array(world_pos) - m[:3, 3]
         return np.dot(m, np.array((pos[0], pos[1], pos[2], 0.)))[:3]
     
     def rotate(self, angle, direction, point=None):
