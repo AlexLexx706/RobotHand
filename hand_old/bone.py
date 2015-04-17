@@ -64,7 +64,10 @@ class Bone(MyFrame):
 
         #установим угол
         offset_angle = angle - self.get_proj_angle(axis, up, vec)
+        self.get_matrix()
         self.rotate(angle=offset_angle, axis=axis.cross(up))
+        self.get_matrix()
+
 
     def get_angle_x(self):
         return self.get_proj_angle(vector(0,1,0), vector(0,0,1), self.up)

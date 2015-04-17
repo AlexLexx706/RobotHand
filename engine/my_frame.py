@@ -72,7 +72,7 @@ class MyFrame:
         if self.frame is None:
             return grob_matrix
 
-        return np.dot(self.frame.get_matrix(), grob_matrix)
+        return self.frame.get_matrix().dot(grob_matrix)
 
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''
@@ -82,19 +82,19 @@ class MyFrame:
         u'''Преобразует глобальные координаты world_pos в локальные координаты фрейма'''
         m = self.get_matrix()
         pos = vector(world_pos) - m[:3, 3]
-        return vector(m.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
+        return vector(m.T.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
     
     def rotate(self, angle, axis, point=None):
         m = np.identity(4)
         m[:3, 0] = self.axis
         m[:3, 1] = self.up
         m[:3, 2] = self.axis.cross(self.up)
-        m[:3, 3] = self.pos
+        #m[:3, 3] = self.pos
         r_m = transformations.rotation_matrix(angle, axis, point)
         n_m = r_m.dot(m)
         self.axis = vector(n_m[:3, 0])
         self.up = vector(n_m[:3, 1])
-        self.pos = vector(n_m[:3, 3])
+        #self.pos = vector(n_m[:3, 3])
 
     def update(self):
         pass

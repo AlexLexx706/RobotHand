@@ -40,7 +40,7 @@ def astuple(A):
     
 
 class vector(np.ndarray):
-    def __new__(subtype, data_x=1, y=0, z=0):
+    def __new__(subtype, data_x=1.0, y=0.0, z=0.0):
         
         if isinstance(data_x, vector):
             return data_x.copy()

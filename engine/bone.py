@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import division
 from my_frame import MyFrame
 from vector import *
 from cylinder import cylinder as arrow
