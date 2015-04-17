@@ -45,7 +45,8 @@ class camera(MyFrame):
         
     def get_point_on_plain(self, x, y, plain):
         '''Возвращает точку на плоскости'''
-        n, pos = plain
+        n = vector(plain[0])
+        pos = vector(plain[0])
         p1 = self.get_pos(x, y)
         p0 = self.eye.get_matrix()[:3, 3]
         d = n.dot(p1 - p0)
@@ -55,7 +56,9 @@ class camera(MyFrame):
 
         r = n.dot(pos - p0) / d
         return vector(p0 + r * (p1 - p0))
-        
+    
+    def get_mouse_pos(self, pos, plain=None):
+        return self.get_point_on_plain(pos.x(), pos.y(), self.get_plain() if plain is None else plain)
         
 
 if __name__ == '__main__':

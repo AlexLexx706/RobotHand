@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from my_frame import MyFrame
 from vector import *
-from box import box as arrow
+from cylinder import cylinder as arrow
 
 
 class Bone(MyFrame):
@@ -248,120 +248,37 @@ class Bone(MyFrame):
 
 
 
-
-
 ###############################################################################
 if __name__ == '__main__':
-    import wx
-    import multiprocessing
-
-    def get_mouse_pos():
-        choice = radio_box.GetSelection()
-
-        #0 - плоскость камеры
-        if choice == 0:
-            return scene.mouse.pos
-        #плоскость X
-        elif choice == 1:
-            return scene.mouse.project(normal=(1, 0, 0), point=(0, 0, 0))
-        #плоскость Y
-        elif choice == 2:
-            return scene.mouse.project(normal=(0, 1, 0), point=(0, 0, 0))
-        #плоскость Z
-        return scene.mouse.project(normal=(0, 0, 1), point=(0, 0, 0))
-
-    L = 600
-    d = 20
+    from PyQt4 import QtGui
+    from scene_view import SceneView
+    import sys
+    from sphere import sphere
     
-    #создадим окно
-    cur_window = window(width=2 * (L + window.dwidth),
-                        height=L + window.dheight + window.menuheight,
-                        menus=True, title='Widgets')
-
-    #создадим окно
-    scene = display(window=cur_window,
-                    x=d,
-                    y=d,
-                    width= L - 2 * d,
-                    height=L - 2 * d,
-                    forward=-vector(0, 1, 2))
-
-    radio_box = wx.RadioBox(cur_window.panel,
-                     pos=(d + L, d),
-                     size=(150, L- 2 * d),
-                     choices=[u'плоскость камеры',
-                              u'плоскость X',
-                              u'плоскость Y',
-                              u'плоскость Z'],
-                     style=wx.RA_SPECIFY_ROWS)
-
+    
+    app = QtGui.QApplication(sys.argv)
+    mainWin = SceneView()
+    
     #координаты
-    x_arrow = arrow(pos=(0, 0, 0), axis=(1, 0, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=color.red)
-    x_arrow = arrow(pos=(0, 0, 0), axis=(0, 1, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=color.green)
-    x_arrow = arrow(pos=(0, 0, 0), axis=(0, 0, 1), length=20, shaftwidth=0.5, fixedwidth = True, color=color.blue)
+    x_arrow = arrow(pos=(0, 0, 0), axis=(1, 0, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=(1,0,0))
+    x_arrow = arrow(pos=(0, 0, 0), axis=(0, 1, 0), length=20, shaftwidth=0.5, fixedwidth = True, color=(0,1,0))
+    x_arrow = arrow(pos=(0, 0, 0), axis=(0, 0, 1), length=20, shaftwidth=0.5, fixedwidth = True, color=(0,0,1))
 
     #создадим руку
     b1 = Bone(freedom_z_angle=(0, 2))
     b2 = Bone(frame=b1, pos=(20, 0, 0),  freedom_z_angle=(0, 2))
     b3 = Bone(frame=b2, pos=(20, 0, 0),  freedom_z_angle=(0, 2))
     b4 = Bone(frame=b3, pos=(20, 0, 0),  freedom_z_angle=(0, 2))
-
-    move_camera = False
-    mouse_down = False
-    camera_pos = None
-
-    scene.autoscale = 0
-    key_masks = {}
-    selected_obj = None
-    selected_obj_color = None
-
-    def mousedown(event):
-        global move_camera
-        global camera_pos
-        global mouse_down
-
-        mouse_down = True
-
-        if event.shift:
-            move_camera = True
-            camera_pos = event.pos
-
-    def mouseup():
-        global move_camera
-        global mouse_down
-        move_camera = False
-        mouse_down = False
-
-    def mousemove(event):
-        global move_camera
-        global mouse_down
-
-        #выбрали обьект
-        if mouse_down:
-            if not move_camera:
-                b4.calk_ik_pos(get_mouse_pos())
-            else:
-                global camera_pos
-                dv = event.pos - camera_pos
-                scene.center = scene.center - dv
-                camera_pos = event.pos
-
-    def key_down_hendler(evt):
-        global key_masks
-        key_masks[evt.key] = True
-
-    def key_up_hendler(evt):
-        global key_masks
-        key_masks[evt.key] = False
-        print evt.key
-        
-    scene.bind('keydown', key_down_hendler)
-    scene.bind('keyup', key_up_hendler)
+    sp = sphere()
     
-    scene.bind('mousedown', mousedown)
-    scene.bind('mouseup', mouseup)
-    scene.bind('mousemove', mousemove)
-    
-    while True:
-        rate(30)
-        #обновление состояний.
+    #обработчик
+    def on_cursor_move(camera, pos):
+        global b4
+        pos = camera.get_mouse_pos(pos, ((0,0,1), (0,0,0)))
+        b4.calk_ik_pos(pos)
+        sp.pos = pos
+
+    mainWin.cursor_move.connect(on_cursor_move)
+    mainWin.show()
+    sys.exit(app.exec_())    
+
