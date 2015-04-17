@@ -82,7 +82,7 @@ class MyFrame:
         u'''Преобразует глобальные координаты world_pos в локальные координаты фрейма'''
         m = self.get_matrix()
         pos = vector(world_pos) - m[:3, 3]
-        return vector(m.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
+        return vector(m.T.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
     
     def rotate(self, angle, axis, point=None):
         m = np.identity(4)
