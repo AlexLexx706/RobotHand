@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from base_shape import base_shape
-
+from vector import *
 
 class box(base_shape):
     def __init__(self, **kwargs):
@@ -14,8 +14,8 @@ class box(base_shape):
             self.height = kwargs["size"][1]
             self.width = kwargs["size"][2]
         else:
-            self.length = kwargs["length"] if "length" in kwargs else self.axis_len
-            self.height = kwargs["height"] if "height" in kwargs else self.up_len
+            self.length = kwargs["length"] if "length" in kwargs else (1.0 if "axis" not in kwargs else vector(kwargs["axis"]).mag)
+            self.height = kwargs["height"] if "height" in kwargs else (1.0 if "up" not in kwargs else vector(kwargs["up"]).mag)
             self.width = kwargs["width"] if "width" in kwargs else 1.0
     
     def make(self):

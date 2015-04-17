@@ -46,7 +46,7 @@ class vector(np.ndarray):
             return data_x.copy()
         
         if isinstance(data_x, np.ndarray):
-            new = data_x.view(subtype)
+            new = data_x.copy().view(subtype)
             intype = np.dtype(float)
 
             if intype != data_x.dtype:

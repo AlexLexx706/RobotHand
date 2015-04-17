@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from matplotlib.rcsetup import validate_nseq_float
 import numpy as np
 from scene import Scene
 import transformations
@@ -16,42 +17,65 @@ class MyFrame:
         up  - орт y
         '''
         self.frame = kwargs["frame"] if "frame" in kwargs else None
-        self.pos = vector(0.0, 0.0, 0.0) if "pos" not in kwargs else vector(kwargs["pos"])
-        self.axis = vector(1.0, 0.0, 0.0) if "axis" not in kwargs else vector(kwargs["axis"])
-         
-        #проверка up
-        if "up" not in kwargs:
-            self.up_len = 1.0
-            self.up = vector(self.axis).cross(vector(0,1,0)).cross(self.axis)
 
-            if self.up.mag == 0:
-                self.up = vector(-1,0,0)
+        #Определение осей
+        if "axis" in kwargs:
+            axis = norm(vector(kwargs["axis"]))
+            up = vector(0.0, 1.0, 0.0) if "up" not in kwargs else vector(kwargs["up"]).norm()
+            up = axis.cross(up).cross(axis)
+
+            if up.mag == 0:
+                up = vector(-1.0, 0.0, 0.0)
         else:
-            self.up = self.axis.cross(vector(kwargs["up"])).cross(self.axis)
-            self.up_len = self.up.mag
+            if "up" not in kwargs:
+                axis = vector(1.0, 0.0, 0.0)
+                up = vector(0.0, 1.0, 0.0)
+            else:
+                up = norm(vector(kwargs["up"]))
+                axis = kwargs.cross((0.0, 1.0, 0.0)).cross(up)
+                if axis.mag == 0:
+                    axis = vector(1.0, 0.0, 0.0)
 
-        self.axis_len = self.axis.mag
+        pos = vector(0.0, 0.0, 0.0) if "pos" not in kwargs else vector(kwargs["pos"])
 
-        #нормализация
-        self.axis.norm()
-        self.up.norm()
-        
         if "x" in kwargs:
-            self.pos[0] = kwargs[0]
-        
+            pos[0] = kwargs[0]
+
         if "y" in kwargs:
-            self.pos[1] = kwargs[1]
+            pos[1] = kwargs[1]
 
         if "z" in kwargs:
-            self.pos[2] = kwargs[2]
-        
+            pos[2] = kwargs[2]
+
+        self.matrix = np.identity(4)
+        self.matrix[:3, 0] = axis
+        self.matrix[:3, 1] = up
+        self.matrix[:3, 2] = axis.cross(up)
+        self.matrix[:3, 3] = pos
+
         self.scene = Scene.GetCurScene()
         self.scene.frames.append(self)
         self.childs = []
         
         if self.frame is not None:
             self.frame.childs.append(self)
-    
+
+    def __getattr__(self, name):
+        if name == "axis":
+            return self.matrix[:3, 0].view(vector)
+        elif name == "up":
+            return self.matrix[:3, 1].view(vector)
+        elif name == "pos":
+            return self.matrix[:3, 3].view(vector)
+        raise AttributeError()
+
+    def __setattr__(self, name, value):
+        if name == "pos":
+            self.matrix[:3, 3] = value
+        else:
+            self.__dict__[name] = value
+
+
     def __del__(self):
         self.scene.frames.remove(self)
         
@@ -62,17 +86,10 @@ class MyFrame:
 
     def get_matrix(self):
         u'''Возвращает матрицу фрейма'''
-        #найдём все фреймы.
-        grob_matrix = np.identity(4)
-        grob_matrix[:3, 0] = self.axis
-        grob_matrix[:3, 1] = self.up
-        grob_matrix[:3, 2] = self.axis.cross(self.up)
-        grob_matrix[:3, 3] = self.pos
-     
         if self.frame is None:
-            return grob_matrix
+            return self.matrix
 
-        return self.frame.get_matrix().dot(grob_matrix)
+        return self.frame.get_matrix().dot(self.matrix)
 
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''
@@ -85,16 +102,11 @@ class MyFrame:
         return vector(m.T.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
     
     def rotate(self, angle, axis, point=None):
-        m = np.identity(4)
-        m[:3, 0] = self.axis
-        m[:3, 1] = self.up
-        m[:3, 2] = self.axis.cross(self.up)
-        #m[:3, 3] = self.pos
+        pos = self.matrix[:3, 3].copy()
+        self.matrix[:3, 3] = (0, 0, 0)
         r_m = transformations.rotation_matrix(angle, axis, point)
-        n_m = r_m.dot(m)
-        self.axis = vector(n_m[:3, 0])
-        self.up = vector(n_m[:3, 1])
-        #self.pos = vector(n_m[:3, 3])
+        self.matrix = r_m.dot(self.matrix)
+        self.matrix[:3, 3] = pos
 
     def update(self):
         pass

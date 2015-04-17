@@ -2,7 +2,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from base_shape import base_shape
-
+from vector import *
 
 class cylinder(base_shape):
     def __init__(self, **kwargs):
@@ -12,7 +12,7 @@ class cylinder(base_shape):
 
         self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)       
         self.radius = kwargs["radius"] if "radius" in kwargs else 1
-        self.length = kwargs["length"] if "length" in kwargs else self.axis_len
+        self.length = kwargs["length"] if "length" in kwargs else (1.0 if "axis" not in kwargs else vector(kwargs["axis"]).mag)
         self.segments = kwargs["segments"] if "segments" in kwargs else 10
     
     def make(self):
