@@ -41,8 +41,7 @@ class Scene():
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glShadeModel(GL_SMOOTH)
         
-        for f in self.frames:
-            f.first_make()
+
         
     def resizeGL(self, width, height):
         side = min(width, height)

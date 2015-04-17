@@ -40,7 +40,7 @@ class camera(MyFrame):
         projection = glGetDoublev(GL_PROJECTION_MATRIX)
         modelview = np.identity(4)
         y = viewport[3] - y
-        z = 1
+        z = 0
         return vector(gluUnProject(x, y, z, modelview, projection, viewport))
         
     def get_point_on_plain(self, x, y, plain):

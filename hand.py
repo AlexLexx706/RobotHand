@@ -7,6 +7,10 @@ from Queue import Queue
 import time
 import math
 
+class T:
+    def __del__(self):
+        print "REMOVE T"
+
 class Hand:
     '''Рука'''
     def __init__(self):
@@ -14,10 +18,16 @@ class Hand:
         self.cmd_queue = None
         self.cmd_queue = Queue()
         #Thread(target=self.proto_proc).start()
-
         self.sponge_angle=0.0
         self.sponge_angle_range=(0, 85 / 180.0 * math.pi)
         self.max_sponge_move=55.0 / 2.0
+
+        #пример удаления
+        b = box()
+        b.remove()
+        del b
+
+
 
         self.base = Bone()
         self.base_box = box(pos=(95/2, 25, 0), length=95, height=75, width=75)

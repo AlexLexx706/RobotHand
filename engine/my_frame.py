@@ -76,13 +76,18 @@ class MyFrame:
             self.__dict__[name] = value
 
 
-    def __del__(self):
+    def remove(self):
         self.scene.frames.remove(self)
         
         for ch in self.childs:
             ch.frame = None
 
-        self.frame.childs = []
+        if self.frame is not None:
+            self.frame.childs.remove(self)
+        self.childs = []
+
+    def __del__(self):
+        print "REMOVE my_frame"
 
     def get_matrix(self):
         u'''Возвращает матрицу фрейма'''
@@ -109,9 +114,6 @@ class MyFrame:
         self.matrix[:3, 3] = pos
 
     def update(self):
-        pass
-    
-    def first_make(self):
         pass
 
 if __name__ == "__main__":

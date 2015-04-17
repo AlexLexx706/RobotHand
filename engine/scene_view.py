@@ -51,7 +51,13 @@ class SceneView(QtOpenGL.QGLWidget):
             offset = event.pos() - self.old_cursore_pos
             self.scene.camera.rotate_camera(-offset.x()*0.001, -offset.y()*0.001)
         elif self.move_cursor:
-            self.cursor_move.emit(self.scene.camera, event.pos())
+            #сдвиг камеры
+            if event.modifiers() & QtCore.Qt.ShiftModifier:
+                pos = self.scene.camera.get_mouse_pos(event.pos())
+                self.scene.camera.pos += (pos - self.old_3d_cur_pos)
+                self.old_3d_cur_pos = pos
+            else:
+                self.cursor_move.emit(self.scene.camera, event.pos())
         self.old_cursore_pos = event.pos()
     
     def mouseReleaseEvent(self, event):
@@ -72,7 +78,10 @@ class SceneView(QtOpenGL.QGLWidget):
             self.rotate_camera = True
         elif QtCore.Qt.LeftButton == event.button():
             self.move_cursor = True
-            self.cursor_move.emit(self.scene.camera, event.pos())
+            if event.modifiers() & QtCore.Qt.ShiftModifier:
+                self.old_3d_cur_pos = self.scene.camera.get_mouse_pos(event.pos())
+            else:
+                self.cursor_move.emit(self.scene.camera, event.pos())
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
