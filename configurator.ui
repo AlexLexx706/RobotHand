@@ -6,28 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>497</height>
+    <width>566</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="GLWidget" name="widget" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
+      <widget class="HandView" name="scene_view" native="true"/>
       <widget class="QFrame" name="frame">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -82,7 +75,7 @@
          </widget>
         </item>
         <item>
-         <widget class="ServosSettings" name="groupBox_2">
+         <widget class="ServosSettings" name="groupBox_settings">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -109,9 +102,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>GLWidget</class>
+   <class>HandView</class>
    <extends>QWidget</extends>
-   <header>engine.scene</header>
+   <header>hand_view</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

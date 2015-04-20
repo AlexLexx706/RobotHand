@@ -211,7 +211,6 @@ class ServoControl(QtGui.QGroupBox):
         self.settings.setValue("value", value)
         self.settings.endGroup()
         self.settings.endGroup()
-        print value
 
         self.horizontalSlider_value.setValue(value)
         self.spinBox_value.setValue(value)

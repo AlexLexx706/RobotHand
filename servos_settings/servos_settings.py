@@ -12,6 +12,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ServosSettings(QtGui.QGroupBox):
+    value_changed = pyqtSignal(int, int)
+    angle_changed = pyqtSignal(int, int)
+    
     def __init__(self, parent=None, settings=QtCore.QSettings("AlexLexx", "robot_hand")):
         super(QtGui.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)[0], "servos_settings.ui"), self)
@@ -38,6 +41,9 @@ class ServosSettings(QtGui.QGroupBox):
 
     def add_control(self, index, settings):
             controll = ServoControl(index, self.settings)
+            controll.value_changed.connect(self.value_changed)
+            controll.angle_changed.connect(self.angle_changed)
+    
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
             self.verticalLayout.insertWidget(self.verticalLayout.count()-1, controll)

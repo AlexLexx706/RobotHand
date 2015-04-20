@@ -18,6 +18,13 @@ class HandView(SceneView):
         self.sphere.pos = pos
         self.hand.calk_ik_pos(pos)
     
+    def on_angle_changed(self, index, value):
+        print "on_angle_changed index: {} value: {}".format(index, value)
+
+    def on_value_changed(self, index, value):
+        print "on_value_changed index: {} value: {}".format(index, value)
+
+        
 if __name__ == '__main__':
     from PyQt4 import QtGui
     import sys
