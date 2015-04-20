@@ -5,10 +5,6 @@ from PyQt4.QtCore import pyqtSlot, pyqtSignal
 from protocol.hand_protocol import HandProtocol
 import os
 import multiprocessing
-import hand.main as main
-
-def scene_proc():
-    main.main()
 
 class Configurator(QtGui.QMainWindow):
     def __init__(self, parent=None):

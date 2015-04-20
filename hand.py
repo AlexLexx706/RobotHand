@@ -148,12 +148,12 @@ class Hand:
                         self.sponge_angle]
                 self.last_time = ct
                 self.cmd_queue.put((1, data))
-        print "0: {} 1: {} 2: {} 3: {} 4: {} 5: {}".format(self.b0.get_angle_x(),
-                                                           self.b1.get_angle_z(),
-                                                           self.b2.get_angle_y(),
-                                                           self.b3.get_angle_z(),
-                                                           self.b4.get_angle_y(),
-                                                           self.sponge_angle)
+        # print "0: {} 1: {} 2: {} 3: {} 4: {} 5: {}".format(self.b0.get_angle_x(),
+                                                           # self.b1.get_angle_z(),
+                                                           # self.b2.get_angle_y(),
+                                                           # self.b3.get_angle_z(),
+                                                           # self.b4.get_angle_y(),
+                                                           # self.sponge_angle)
         return pos
     
     def get_target_pos(self):

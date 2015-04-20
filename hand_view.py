@@ -14,7 +14,7 @@ class HandView(SceneView):
         self.sphere = sphere(radius=10)
     
     def on_cursor_move(self, camera, pos):
-        pos = camera.get_point_on_plain(pos.x(), pos.y(), camera.get_plain())
+        pos = camera.get_point_on_plain(pos, camera.get_plain())
         self.sphere.pos = pos
         self.hand.calk_ik_pos(pos)
     

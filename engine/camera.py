@@ -35,7 +35,9 @@ class camera(MyFrame):
         self.rotate(x, vector(0,1,0))
         self.koleno.rotate(y, vector(1,0,0))
 
-    def get_pos(self, x, y):
+    def get_pos(self, pos):
+        x = pos.x()
+        y = pos.y()
         viewport = glGetIntegerv(GL_VIEWPORT)
         projection = glGetDoublev(GL_PROJECTION_MATRIX)
         modelview = np.identity(4)
@@ -43,11 +45,11 @@ class camera(MyFrame):
         z = 0
         return vector(gluUnProject(x, y, z, modelview, projection, viewport))
         
-    def get_point_on_plain(self, x, y, plain):
+    def get_point_on_plain(self, m_pos, plain):
         '''Возвращает точку на плоскости'''
         n = vector(plain[0])
         pos = vector(plain[0])
-        p1 = self.get_pos(x, y)
+        p1 = self.get_pos(m_pos)
         p0 = self.eye.get_matrix()[:3, 3]
         d = n.dot(p1 - p0)
 
@@ -58,7 +60,7 @@ class camera(MyFrame):
         return vector(p0 + r * (p1 - p0))
     
     def get_mouse_pos(self, pos, plain=None):
-        return self.get_point_on_plain(pos.x(), pos.y(), self.get_plain() if plain is None else plain)
+        return self.get_point_on_plain(pos, self.get_plain() if plain is None else plain)
         
 
 if __name__ == '__main__':

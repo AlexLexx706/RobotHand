@@ -20,7 +20,7 @@ class SceneView(QtOpenGL.QGLWidget):
         self.rotate_camera = False
         self.move_cursor = False
         self.old_cursore_pos = None
-        self.sphere = sphere()
+        self.sphere = sphere(raduis=0.1)
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -53,9 +53,9 @@ class SceneView(QtOpenGL.QGLWidget):
         elif self.move_cursor:
             #сдвиг камеры
             if event.modifiers() & QtCore.Qt.ShiftModifier:
-                pos = self.scene.camera.get_mouse_pos(event.pos())
-                self.scene.camera.pos += (pos - self.old_3d_cur_pos)
-                self.old_3d_cur_pos = pos
+                s_p = self.scene.camera.get_mouse_pos(QtCore.QPoint(0,0))
+                n_p = self.scene.camera.get_mouse_pos(event.pos() - self.old_cursore_pos)
+                self.scene.camera.pos -= (n_p - s_p)
             else:
                 self.cursor_move.emit(self.scene.camera, event.pos())
         self.old_cursore_pos = event.pos()
