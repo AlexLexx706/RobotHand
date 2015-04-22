@@ -46,30 +46,23 @@ class ServosSettings(QtGui.QGroupBox):
         dialog = CreateServoDialog(self.get_servo_ids())
         
         if dialog.exec_() == QtGui.QDialog.Accepted:
-            self.add_control(dialog.get_id(), None)
+            control_settings = {"min": [0.0, 500], "max": [180.0, 2500], "index": dialog.get_id(), "value": 500}
+            self.add_control(control_settings)
 
-    def add_control(self, index, settings):
-            controll = ServoControl(index, self.settings)
+    def add_control(self, control_settings):
+            controll = ServoControl(control_settings)
             controll.value_changed.connect(self.value_changed)
             controll.angle_changed.connect(self.angle_changed)
-            self.controlls_map[index] = controll
-    
+            self.controlls_map[controll.index] = controll
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
             self.verticalLayout.insertWidget(self.verticalLayout.count()-1, controll)
-            
-            if settings is not None:
-                controll.set_settings(settings)
     
     def remove_control(self, control):
         self.verticalLayout.removeWidget(control)
         self.controlls.remove(control)
         del self.controlls_map[control.index]
         control.hide()
-
-        self.settings.beginGroup("servo_control")
-        self.settings.remove("")
-        self.settings.endGroup()
 
     @pyqtSlot('bool')
     def on_pushButton_save_settings_clicked(self, v):
@@ -97,8 +90,8 @@ class ServosSettings(QtGui.QGroupBox):
             while len(self.controlls):
                 self.remove_control(self.controlls[0])
             try:
-                for settings in json.loads(open(file_name, "rb").read()):
-                    self.add_control(settings[2], settings)
+                for c_s in json.loads(open(file_name, "rb").read()):
+                    self.add_control(c_s)
             except IOError as e:
                 logger.warning(e)
    
