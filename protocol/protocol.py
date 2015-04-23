@@ -25,12 +25,7 @@ class Protocol:
                 self.serial.close()
                 self.serial = None
 
-            try:
-                self.serial = serial.Serial(port=port, baudrate=baudrate)
-                return True
-            except serial.SerialException as e:
-                logger.error(e)
-            return False
+            self.serial = serial.Serial(port=port, baudrate=baudrate)
         finally:
             logger.debug("<-")
 

@@ -19,7 +19,6 @@ class ServoControl(QtGui.QGroupBox):
         super(QtGui.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)[0], "servo_control.ui"), self)
         self.settings = settings
-        print "self.settings: ", self.settings
         self.set_index(settings["index"])
         self.addAction(self.action_remove)
         self.load_default()
@@ -95,8 +94,6 @@ class ServoControl(QtGui.QGroupBox):
         value = int(value / float(self.horizontalSlider_value.maximum()) *\
                (self.spinBox_max_value.value() - self.spinBox_min_value.value()) +\
                self.spinBox_min_value.value())
-        #print "value: ", value
-        
         self.set_value(value)
 
     @pyqtSlot('int')
@@ -119,6 +116,7 @@ class ServoControl(QtGui.QGroupBox):
     
     @pyqtSlot('int')
     def on_spinBox_value_valueChanged(self, value):
+        print "on_spinBox_value_valueChanged"
         self.set_value(value)
         
     @pyqtSlot('double')
@@ -166,7 +164,7 @@ class ServoControl(QtGui.QGroupBox):
         self.set_angle(value)
     
     def set_value(self, value):
-        '''Обновилось значение'''
+        '''Установить значение'''
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
         self.doubleSpinBox_angle.blockSignals(True)
@@ -189,10 +187,11 @@ class ServoControl(QtGui.QGroupBox):
         self.horizontalSlider_angle.blockSignals(False)        
         
         self.value_changed.emit(self.index, value)
+        print "emit value:", value
         self.angle_changed.emit(self.index, angle)
         
     def set_angle(self, angle):
-        '''Обновился угол'''
+        '''Установить угол'''
         self.horizontalSlider_value.blockSignals(True)
         self.spinBox_value.blockSignals(True)
         self.doubleSpinBox_angle.blockSignals(True)

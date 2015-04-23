@@ -4,15 +4,14 @@ import struct
 import logging
 import protocol
 import math
+import threading
 
 logger = logging.getLogger(__name__)
 
 class HandProtocol(protocol.Protocol):
     def __init__(self, **kwargs):
-        try:
-            protocol.Protocol.__init__(self, **kwargs)
-        except Exception as e:
-            print e
+        protocol.Protocol.__init__(self, **kwargs)
+        self.lock = threading.Lock()
 
         self.limmits = [[[-65 / 180. * math.pi, 2395], [90 / 180. * math.pi, 543], 1],
                         [[-135 / 180. * math.pi, 543], [0 / 180. * math.pi, 2065], 2],
@@ -21,12 +20,17 @@ class HandProtocol(protocol.Protocol):
                         [[-105 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870], 5],
                         [[0 / 180. * math.pi, 1239], [85 / 180. * math.pi, 1913], 6]]
     
+    def set_limmits(self, limmits):
+        with self.lock:
+            self.limmits = limmits
+    
     def rotate(self, id, angle):
-        if id < 0 or id >= len(self.limmits):
-            return
+        with self.lock:
+            if id < 0 or id >= len(self.limmits):
+                return
 
-        limmit = self.limmits[id]
-        
+            limmit = self.limmits[id]
+
         if angle < limmit[0][0]:
             angle = limmit[0][0] 
 
@@ -51,10 +55,12 @@ class HandProtocol(protocol.Protocol):
 
 
     def move_hand(self, angles):
-        if len(angles) != len(self.limmits):
-            return
-        logger.debug("move_hand({})".format(angles))
-        self.move_servos([self.get_angle(i, a) for i, a in enumerate(angles)], 0.05)
+        with self.lock:
+            if len(angles) != len(self.limmits):
+                return
+            data = [self.get_angle(i, a) for i, a in enumerate(angles)]
+        
+        self.move_servos(data, 0.05)
 
 if __name__ == "__main__":
     import time

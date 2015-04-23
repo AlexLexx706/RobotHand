@@ -240,38 +240,5 @@
   <tabstop>doubleSpinBox_max_angle</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>horizontalSlider_value</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_value</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>238</x>
-     <y>26</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>313</x>
-     <y>23</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_value</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>horizontalSlider_value</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>325</x>
-     <y>33</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>278</x>
-     <y>30</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

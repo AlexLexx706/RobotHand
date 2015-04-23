@@ -8,6 +8,7 @@ from create_servo_dialog import CreateServoDialog
 import json
 import sys
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +26,6 @@ class ServosSettings(QtGui.QGroupBox):
         self.controlls = []
         self.controlls_map = {}
 
-        #инициализация параметров
-        self.settings.beginGroup("servo_control")
-        self.settings.endGroup()
-        
         self.open_settings(self.settings.value("last_file").toString())
     
     def on_angles_changed(self, data):
@@ -41,7 +38,15 @@ class ServosSettings(QtGui.QGroupBox):
     
     def get_servo_ids(self):
         return [ c.index for c in self.controlls]
+    
+    def get_protocol_settings(self):
+        res = []
         
+        for c in self.controlls:
+            settings = c.get_settings()
+            res.append(((settings["min"][0] / 180.0 * math.pi, settings["min"][1]),
+                        (settings["max"][0] / 180.0 * math.pi, settings["max"][1]), settings["index"]))
+        return res
         
     @pyqtSlot('bool')
     def on_action_add_servo_triggered(self, v):

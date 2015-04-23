@@ -7,27 +7,14 @@ from Queue import Queue
 import time
 import math
 
-class T:
-    def __del__(self):
-        print "REMOVE T"
-
 class Hand:
     '''Рука'''
     def __init__(self):
         '''Модель руки робота'''
         self.cmd_queue = None
-        self.cmd_queue = Queue()
-        #Thread(target=self.proto_proc).start()
         self.sponge_angle=0.0
         self.sponge_angle_range=(0, 85 / 180.0 * math.pi)
         self.max_sponge_move=55.0 / 2.0
-
-        #пример удаления
-        b = box()
-        b.remove()
-        del b
-
-
 
         self.base = Bone()
         self.base_box = box(pos=(95/2, 25, 0), length=95, height=75, width=75)
@@ -93,7 +80,6 @@ class Hand:
 
     def proto_proc(self):
         '''Обработка комманд'''
-        from protocol.hand_protocol import HandProtocol
 
         proto = HandProtocol(port="COM27", baudrate=128000)
 
@@ -148,14 +134,72 @@ class Hand:
                         self.sponge_angle]
                 self.last_time = ct
                 self.cmd_queue.put((1, data))
-        # print "0: {} 1: {} 2: {} 3: {} 4: {} 5: {}".format(self.b0.get_angle_x(),
-                                                           # self.b1.get_angle_z(),
-                                                           # self.b2.get_angle_y(),
-                                                           # self.b3.get_angle_z(),
-                                                           # self.b4.get_angle_y(),
-                                                           # self.sponge_angle)
         return pos
     
+    def get_angles(self):
+        '''Получить углы, сервисная функция'''
+        return ((1, self.b0.get_angle_x() / math.pi * 180),
+                (2, self.b1.get_angle_z() / math.pi * 180),
+                (3, self.b2.get_angle_y() / math.pi * 180),
+                (4, self.b3.get_angle_z() / math.pi * 180),
+                (5, self.b4.get_angle_y() / math.pi * 180),
+                (6, self.sponge_angle / math.pi * 180))
+    
+    def set_angle(self, index, value):
+        '''Установить углы, сервисная функция'''
+
+        value =  value / 180.0 * math.pi
+        
+        if index == 1:
+            self.b0.set_angle_x(value)
+
+            if self.cmd_queue is not None:
+                self.cmd_queue.put((0, (0, self.b0.get_angle_x())))
+
+        elif index == 2:
+            self.b1.set_angle_z(value)
+
+            if self.cmd_queue is not None:
+                self.cmd_queue.put((0, (1, self.b1.get_angle_z())))
+
+        elif index == 3:
+            self.b2.set_angle_y(value)
+
+            if self.cmd_queue is not None:
+                self.cmd_queue.put((0, (2, self.b2.get_angle_y())))
+
+        elif index == 4:
+            self.b3.set_angle_z(value)
+            
+            if self.cmd_queue is not None:
+                self.cmd_queue.put((0, (3, self.b3.get_angle_z())))
+                
+        elif index == 5:
+            self.b4.set_angle_y(value)
+
+            if self.cmd_queue is not None:
+                self.cmd_queue.put((0, (4, self.b4.get_angle_y())))
+
+        elif index == 6:
+            self.set_sponge_value(value)
+    
+    def set_angle_range_changed(self, index, min, max):
+        '''Установить пределы, сервисная функция'''
+        freedom=(min / 180.0 * math.pi, max / 180. * math.pi)
+        
+        if index == 1:
+            self.b0.freedom_x_angle = freedom
+        elif index == 2:
+            self.b1.freedom_z_angle = freedom
+        elif index == 3:
+            self.b2.freedom_y_angle = freedom
+        elif index == 4:
+            self.b3.freedom_z_angle = freedom
+        elif index == 5:
+            self.b4.freedom_y_angle = freedom
+        elif index == 6:
+            self.sponge_angle_range = freedom
+        
     def get_target_pos(self):
         '''Получить точку конца манипулятора'''
         return self.end.frame_to_world(vector(0,0,0))
@@ -170,52 +214,6 @@ class Hand:
     def get_hand_angle(self, angle):
         '''Вращать руку'''
         return self.b4.get_angle_y()
-
-
-
-class StateGetTarget:
-    def __init__(self, hand, target, new_target_pos):
-        '''Состояние взять цель'''
-        self.hand=hand
-        self.target=target
-        self.new_target_pos = new_target_pos
-
-    def run(self):
-        '''Реализация забора цели'''
-        #1) откроем схват
-        self.hand.open_sponges()
-        time.sleep(1)
-
-        #2) переместим схват над целью
-        self.hand.calk_ik_pos(self.target + vector(0,80,0), count=10)
-        time.sleep(1)
-
-
-        #2) опустим на цель
-        self.hand.calk_ik_pos(self.target, count=10)
-        time.sleep(1)
-
-
-        #3) Сожмём схват
-        self.hand.set_sponge_value(20/180*math.pi)
-        time.sleep(1)
-
-        #4) поднять над позицией на безопасное раасстояние
-        self.hand.calk_ik_pos(self.target + vector(0,80,0), count=10)
-        time.sleep(1)
-
-        #5) преренесём на новую позицию
-        self.hand.calk_ik_pos(self.new_target_pos + vector(0,80,0), count=10)
-        time.sleep(1)
-
-        self.hand.calk_ik_pos(self.new_target_pos, count=10)
-        time.sleep(1)
-
-        self.hand.open_sponges()
-        time.sleep(1)
-
-        self.hand.calk_ik_pos(self.new_target_pos + vector(0,80,0), count=10)
-        time.sleep(1)
 
 if __name__ == '__main__':
     from PyQt4 import QtGui
