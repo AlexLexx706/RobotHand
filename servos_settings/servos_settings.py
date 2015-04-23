@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 class ServosSettings(QtGui.QGroupBox):
     value_changed = pyqtSignal(int, int)
     angle_changed = pyqtSignal(int, float)
+    angle_range_changed = pyqtSignal(int, float, float)
+    value_range_changed = pyqtSignal(int, int, int)
     
     def __init__(self, parent=None, settings=QtCore.QSettings("AlexLexx", "robot_hand")):
         super(QtGui.QGroupBox, self).__init__(parent)
@@ -53,6 +55,9 @@ class ServosSettings(QtGui.QGroupBox):
             controll = ServoControl(control_settings)
             controll.value_changed.connect(self.value_changed)
             controll.angle_changed.connect(self.angle_changed)
+            controll.angle_range_changed.connect(self.angle_range_changed)
+            controll.value_range_changed.connect(self.value_range_changed)
+            
             self.controlls_map[controll.index] = controll
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
@@ -61,6 +66,12 @@ class ServosSettings(QtGui.QGroupBox):
     def remove_control(self, control):
         self.verticalLayout.removeWidget(control)
         self.controlls.remove(control)
+        
+        control.value_changed.disconnect(self.value_changed)
+        control.angle_changed.disconnect(self.angle_changed)
+        control.angle_range_changed.disconnect(self.angle_range_changed)
+        control.value_range_changed.disconnect(self.value_range_changed)
+        
         del self.controlls_map[control.index]
         control.hide()
 

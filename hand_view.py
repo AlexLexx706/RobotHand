@@ -47,7 +47,20 @@ class HandView(SceneView):
 
     def on_value_changed(self, index, value):
         pass
-
+    
+    def on_angle_range_changed(self, index, min, max):
+        freedom=(min / 180.0 * math.pi, max / 180. * math.pi)
+        
+        if index == 1:
+            self.hand.b0.freedom_x_angle = freedom
+        elif index == 2:
+            self.hand.b1.freedom_z_angle = freedom
+        elif index == 3:
+            self.hand.b2.freedom_y_angle = freedom
+        elif index == 4:
+            self.hand.b3.freedom_z_angle = freedom
+        elif index == 5:
+            self.hand.b4.freedom_y_angle = freedom
         
 if __name__ == '__main__':
     from PyQt4 import QtGui
