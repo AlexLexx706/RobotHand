@@ -1,1 +1,1 @@
-For start programm do this: python configurator
+For start program do this: python configurator
