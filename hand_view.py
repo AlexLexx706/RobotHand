@@ -24,13 +24,15 @@ class HandView(SceneView):
 
     def on_angle_changed(self, index, value):
         self.hand.set_angle(index, value)
-
-    def on_value_changed(self, index, value):
-        #print "on_value_changed(index:{}, value:{})".format(index, value)
-        pass
     
+    def on_enable_angle_changed(self, index, e):
+        self.hand.set_enable_angle(index, e)
+        
     def on_angle_range_changed(self, index, min, max):
         self.hand.set_angle_range_changed(index, min, max)
+
+    def on_enable_angle_changed(self, index, e):
+        self.hand.set_enable_angle(index, e)
         
 if __name__ == '__main__':
     from PyQt4 import QtGui

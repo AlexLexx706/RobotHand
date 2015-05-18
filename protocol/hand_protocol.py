@@ -13,23 +13,24 @@ class HandProtocol(protocol.Protocol):
         protocol.Protocol.__init__(self, **kwargs)
         self.lock = threading.Lock()
 
-        self.limmits = [[[-65 / 180. * math.pi, 2395], [90 / 180. * math.pi, 543], 1],
-                        [[-135 / 180. * math.pi, 543], [0 / 180. * math.pi, 2065], 2],
-                        [[-150 / 180. * math.pi, 2500], [0 / 180. * math.pi, 804], 3],
-                        [[0 / 180. * math.pi, 1000], [110 / 180. * math.pi, 2300], 4],
-                        [[-105 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870], 5],
-                        [[0 / 180. * math.pi, 1239], [85 / 180. * math.pi, 1913], 6]]
+        self.limmits = {1: [[-65 / 180. * math.pi, 2395], [90 / 180. * math.pi, 543]],
+                        2: [[-135 / 180. * math.pi, 543], [0 / 180. * math.pi, 2065]],
+                        3: [[-150 / 180. * math.pi, 2500], [0 / 180. * math.pi, 804]],
+                        4: [[0 / 180. * math.pi, 1000], [110 / 180. * math.pi, 2300]],
+                        5: [[-105 / 180. * math.pi, 2500], [90 / 180. * math.pi, 870]],
+                        6: [[0 / 180. * math.pi, 1239], [85 / 180. * math.pi, 1913]] }
     
-    def set_limmits(self, limmits):
+    def set_limmit(self, index,  limmits):
         with self.lock:
-            self.limmits = limmits
+            if index in self.limmits:
+                self.limmits[index] = limmits
     
-    def rotate(self, id, angle):
+    def rotate(self, index, angle):
         with self.lock:
-            if id < 0 or id >= len(self.limmits):
-                return
+            if index not in self.limmits:
+                RuntimeError("wrong index:{}".format(index))
 
-            limmit = self.limmits[id]
+        limmit = self.limmits[index]
 
         if angle < limmit[0][0]:
             angle = limmit[0][0] 
@@ -39,10 +40,13 @@ class HandProtocol(protocol.Protocol):
         
         #делаем поворот
         v = (angle - limmit[0][0]) / (limmit[1][0] - limmit[0][0]) * (limmit[1][1] - limmit[0][1]) + limmit[0][1]
-        self.move_servo(limmit[2], int(v), time_move_sec=0.05)
+        self.move_servo(index, int(v), time_move_sec=0.05)
 
-    def get_angle(self, id, angle):
-        limmit = self.limmits[id]
+    def get_angle(self, index, angle):
+        if index not in self.limmits:
+            RuntimeError("wrong index:{}".format(index))
+
+        limmit = self.limmits[index]
 
         if angle < limmit[0][0]:
             angle = limmit[0][0]
@@ -51,15 +55,12 @@ class HandProtocol(protocol.Protocol):
             angle = limmit[1][0]
 
         #делаем поворот
-        return limmit[2], (angle - limmit[0][0]) / (limmit[1][0] - limmit[0][0]) * (limmit[1][1] - limmit[0][1]) + limmit[0][1]
+        return index, (angle - limmit[0][0]) / (limmit[1][0] - limmit[0][0]) * (limmit[1][1] - limmit[0][1]) + limmit[0][1]
 
 
     def move_hand(self, angles):
         with self.lock:
-            if len(angles) != len(self.limmits):
-                return
-            data = [self.get_angle(i, a) for i, a in enumerate(angles)]
-        
+            data = [self.get_angle(index, angle) for index, angle in angles]
         self.move_servos(data, 0.05)
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ class ServosSettings(QtGui.QGroupBox):
     angle_changed = pyqtSignal(int, float)
     angle_range_changed = pyqtSignal(int, float, float)
     value_range_changed = pyqtSignal(int, int, int)
+    enable_angle_changed = pyqtSignal(int, bool)
+    range_changed = pyqtSignal(int, object)
     
     def __init__(self, parent=None, settings=QtCore.QSettings("AlexLexx", "robot_hand")):
         super(QtGui.QGroupBox, self).__init__(parent)
@@ -40,12 +42,11 @@ class ServosSettings(QtGui.QGroupBox):
         return [ c.index for c in self.controlls]
     
     def get_protocol_settings(self):
-        res = []
+        res = {}
         
         for c in self.controlls:
             settings = c.get_settings()
-            res.append(((settings["min"][0] / 180.0 * math.pi, settings["min"][1]),
-                        (settings["max"][0] / 180.0 * math.pi, settings["max"][1]), settings["index"]))
+            res[settings["index"]] = (settings["min"], settings["max"])
         return res
         
     @pyqtSlot('bool')
@@ -53,7 +54,7 @@ class ServosSettings(QtGui.QGroupBox):
         dialog = CreateServoDialog(self.get_servo_ids())
         
         if dialog.exec_() == QtGui.QDialog.Accepted:
-            control_settings = {"min": [0.0, 500], "max": [180.0, 2500], "index": dialog.get_id(), "value": 500}
+            control_settings = {"min": [0.0, 500], "max": [math.pi, 2500], "index": dialog.get_id(), "value": 500}
             self.add_control(control_settings)
 
     def add_control(self, control_settings):
@@ -62,23 +63,27 @@ class ServosSettings(QtGui.QGroupBox):
             controll.angle_changed.connect(self.angle_changed)
             controll.angle_range_changed.connect(self.angle_range_changed)
             controll.value_range_changed.connect(self.value_range_changed)
+            controll.enable_angle_changed.connect(self.enable_angle_changed)
+            controll.range_changed.connect(self.range_changed)
             
             self.controlls_map[controll.index] = controll
             self.controlls.append(controll)
             controll.remove_control.connect(self.remove_control)
             self.verticalLayout.insertWidget(self.verticalLayout.count()-1, controll)
     
-    def remove_control(self, control):
-        self.verticalLayout.removeWidget(control)
-        self.controlls.remove(control)
+    def remove_control(self, controll):
+        self.verticalLayout.removeWidget(controll)
+        self.controlls.remove(controll)
         
-        control.value_changed.disconnect(self.value_changed)
-        control.angle_changed.disconnect(self.angle_changed)
-        control.angle_range_changed.disconnect(self.angle_range_changed)
-        control.value_range_changed.disconnect(self.value_range_changed)
+        controll.value_changed.disconnect(self.value_changed)
+        controll.angle_changed.disconnect(self.angle_changed)
+        controll.angle_range_changed.disconnect(self.angle_range_changed)
+        controll.value_range_changed.disconnect(self.value_range_changed)
+        controll.enable_angle_changed.disconnect(self.enable_angle_changed)
+        controll.range_changed.connect(self.range_changed)
         
-        del self.controlls_map[control.index]
-        control.hide()
+        del self.controlls_map[controll.index]
+        controll.hide()
 
     @pyqtSlot('bool')
     def on_pushButton_save_settings_clicked(self, v):

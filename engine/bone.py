@@ -32,6 +32,24 @@ class Bone(MyFrame):
         self.z_arrow = arrow(frame=self, pos=(0, 0, 0), axis=(0, 0, 1), length=10, shaftwidth=1, fixedwidth = True, color=(0,0,1))
         self.set_visible_center(show_center)
     
+    def set_freedom_x_angle(self, freedom):
+        self.freedom_x_angle = freedom
+
+    def get_freedom_x_angle(self):
+        return self.freedom_x_angle
+
+    def set_freedom_y_angle(self, freedom):
+        self.freedom_y_angle = freedom
+
+    def get_freedom_y_angle(self):
+        return self.freedom_y_angle
+
+    def set_freedom_z_angle(self, freedom):
+        self.freedom_z_angle = freedom
+
+    def get_freedom_z_angle(self):
+        return self.freedom_z_angle
+    
     def add_target(self, glob_pos, pos, weight):
         self.targets.append((glob_pos, pos, weight))
 
