@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>393</width>
-    <height>73</height>
+    <height>77</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -49,6 +49,9 @@
       </property>
       <item>
        <widget class="QSlider" name="horizontalSlider_angle">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;значение&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -60,6 +63,9 @@
         </property>
         <property name="value">
          <number>360</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -99,6 +105,9 @@
    </item>
    <item row="0" column="4">
     <widget class="QFrame" name="frame">
+     <property name="contextMenuPolicy">
+      <enum>Qt::ActionsContextMenu</enum>
+     </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -114,6 +123,9 @@
       </property>
       <item>
        <widget class="QSlider" name="horizontalSlider_value">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;значение&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -122,6 +134,18 @@
         </property>
         <property name="maximum">
          <number>3000</number>
+        </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
+        <property name="pageStep">
+         <number>100</number>
+        </property>
+        <property name="sliderPosition">
+         <number>21</number>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -133,7 +157,7 @@
          <bool>false</bool>
         </property>
         <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
+         <enum>QSlider::TicksAbove</enum>
         </property>
        </widget>
       </item>
@@ -260,6 +284,21 @@
     <string>Установить максимум угла</string>
    </property>
   </action>
+  <action name="action_set_min_value">
+   <property name="text">
+    <string>Установить минимум значения</string>
+   </property>
+  </action>
+  <action name="action_set_max_value">
+   <property name="text">
+    <string>Установить максимум значения</string>
+   </property>
+  </action>
+  <action name="action_reverse">
+   <property name="text">
+    <string>реверс</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>spinBox_min_value</tabstop>
@@ -272,5 +311,22 @@
   <tabstop>doubleSpinBox_max_angle</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>horizontalSlider_value</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_value</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>313</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

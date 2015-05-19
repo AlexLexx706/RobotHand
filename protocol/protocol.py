@@ -26,6 +26,7 @@ class Protocol:
                 self.serial = None
 
             self.serial = serial.Serial(port=port, baudrate=baudrate)
+            self.serial.write('#VERIFY\n\r')
         finally:
             logger.debug("<-")
 
@@ -50,7 +51,7 @@ class Protocol:
         if self.serial is not None:
             self.serial.write('#{}P{}T{}\n\r'.format(int(ch), int(pulse_width_us), int(time_move_sec * 100)))
             logger.debug("ch:{} pw:{} time:{}".format(ch, pulse_width_us, time_move_sec))
-            time.sleep(time_move_sec)
+            #time.sleep(time_move_sec)
 
     def move_servos(self, data, time_move_sec=1):
         '''
@@ -62,7 +63,7 @@ class Protocol:
             s = '{}T{}\n\r'.format("".join(["#{}P{}".format(int(ch), int(pw)) for ch, pw in data]), int(time_move_sec * 100))
             self.serial.write(s)
             logger.debug("move_servos <-")
-            time.sleep(time_move_sec)
+            #time.sleep(time_move_sec)
 
 if __name__ == "__main__":
     import math

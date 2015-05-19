@@ -34,14 +34,17 @@ class Configurator(QtGui.QMainWindow):
     
     def on_range_changed(self, index, value):
         if self.proto is not None:
+            print "on_range_changed", index, value
             self.proto.set_limmit(index, value)
 
     def on_value_changed(self, index, value):
-        print "on_value_changed", index, value
+        if self.proto is not None and not self.get_enable_angle(index):
+            print "on_value_changed", index, value
 
-        if self.proto is not None:
             self.scene_view.hand.cmd_queue.put((2, (index, value)))
-
+    
+    def get_enable_angle(self, index):
+        return self.scene_view.hand.get_enable_angle(index)
             
     @pyqtSlot(bool)
     def on_pushButton_connect_clicked(self, v):
@@ -81,7 +84,8 @@ class Configurator(QtGui.QMainWindow):
             elif cmd == 1:
                 self.proto.move_hand(data)
             elif cmd == 2:
-                self.proto.move_servo(data[0], data[1], time_move_sec=0.05)
+                #управление только при разблокировки
+                self.proto.move_servo(data[0], data[1])
 
                 
 if __name__ == '__main__':

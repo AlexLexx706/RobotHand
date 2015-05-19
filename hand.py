@@ -12,6 +12,11 @@ def atr(angle):
     
 class Hand:
     '''Рука'''
+    
+    class WrongIndexError(Exception):
+        '''Ошибка не верный индекс'''
+        pass
+    
     def __init__(self):
         '''Модель руки робота'''
         self.cmd_queue = None
@@ -81,9 +86,6 @@ class Hand:
         offset = self.max_sponge_move * ((angle - self.sponge_angle_range[0]) / (self.sponge_angle_range[1] - self.sponge_angle_range[0]))
         self.b4_sponge_l.pos=vector(0, -(50 + 55/2), 6/2 + offset)
         self.b4_sponge_r.pos=vector(0, -(50 + 55/2), -6/2 - offset)
-        
-        if self.cmd_queue is not None:
-            self.cmd_queue.put((0, (5, self.sponge_angle)))
 
     def get_sponge_value(self):
         return self.sponge_angle
@@ -131,22 +133,39 @@ class Hand:
 
     def set_angle(self, index, value):
         '''Установить углы, сервисная функция'''
-        if index in self.fun_map:
-            self.fun_map[index]["set_angle"](value)
-            
-            if self.cmd_queue is not None and self.fun_map[index]["enable"]:
-                self.cmd_queue.put((0, (index, self.fun_map[index]["get_angle"]())))
+        if index not in self.fun_map:
+            raise self.WrongIndexError(index)
+
+        print "set_angle", index, value
+        self.fun_map[index]["set_angle"](value)
+        
+        if self.cmd_queue is not None and self.fun_map[index]["enable"]:
+            self.cmd_queue.put((0, (index, self.fun_map[index]["get_angle"]())))
     
     def set_enable_angle(self, index, e):
         '''Установить разрешение генерить комманды'''
         if index in self.fun_map:
             self.fun_map[index]["enable"] = e
             print index, e
-    
+
+    def get_enable_angle(self, index):
+        '''Возвращает разрешение'''
+        if index not in self.fun_map:
+            raise self.WrongIndexError(index)
+
+        return self.fun_map[index]["enable"]
+            
     def set_angle_range_changed(self, index, min, max):
         '''Установить пределы, сервисная функция'''
-        if index in self.fun_map:
-            self.fun_map[index]["set_freedom"]((min, max))
+        if index not in self.fun_map:
+            raise self.WrongIndexError(index)
+
+        if min > max:
+            m = max
+            max = min
+            min = m
+            
+        self.fun_map[index]["set_freedom"]((min, max))
         
     def get_target_pos(self):
         '''Получить точку конца манипулятора'''
