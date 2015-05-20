@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 from engine import *
-from threading import Thread
 from Queue import Queue
 import time
 import math

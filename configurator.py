@@ -31,6 +31,11 @@ class Configurator(QtGui.QMainWindow):
         self.proto = None
         self.on_pushButton_reset_hand_clicked(1)
 
+    def closeEvent(self, event):
+        self.scene_view.timer.stop()
+        #event.accept()
+ 
+        
     @pyqtSlot(int)
     def on_spinBox_port_valueChanged(self, v):
         self.settings.setValue("port_name", v)
@@ -111,12 +116,22 @@ class Configurator(QtGui.QMainWindow):
         #начало смещения
         if state == 0:
             self.offset = self.plain_pos - pos
-        p = pos + self.offset
-        self.scene_view.sphere.pos = p
+        new_pos = pos + self.offset
+        
+        if not self.checkBox_o_x.isChecked():
+            new_pos[0] = self.plain_pos[0]
+
+        if not self.checkBox_o_y.isChecked():
+            new_pos[1] = self.plain_pos[1]
+
+        if not self.checkBox_o_z.isChecked():
+            new_pos[2] = self.plain_pos[2]
+        
+        self.scene_view.sphere.pos = new_pos
         
         #кинематика
         if self.checkBox_kinematic.isChecked():
-            self.scene_view.set_hand_pos(p)
+            self.scene_view.set_hand_pos(new_pos)
     
     @pyqtSlot(bool)
     def on_pushButton_reset_hand_clicked(self, v):

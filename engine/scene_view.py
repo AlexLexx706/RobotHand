@@ -13,15 +13,15 @@ class SceneView(QtOpenGL.QGLWidget):
     
     def __init__(self, parent=None):
         QtOpenGL.QGLWidget.__init__(self, parent)
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self.update)
-        timer.start(20)
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update)
+        self.timer.start(20)
         self.scale_camera = False
         self.rotate_camera = False
         self.move_cursor = False
         self.old_cursore_pos = None
         self.sphere = sphere(radius=10)
-
+    
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
 
