@@ -7,6 +7,7 @@ import os
 import threading 
 import Queue
 import logging
+from engine import vector
 
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ class Configurator(QtGui.QMainWindow):
         self.groupBox_settings.angle_changed.connect(self.scene_view.on_angle_changed)
         self.groupBox_settings.enable_angle_changed.connect(self.scene_view.on_enable_angle_changed)
         self.groupBox_settings.angle_range_changed.connect(self.scene_view.on_angle_range_changed)
+        self.scene_view.cursor_move.connect(self.on_cursor_move)
         
         self.groupBox_settings.range_changed.connect(self.on_range_changed)
         self.groupBox_settings.value_changed.connect(self.on_value_changed)
@@ -27,7 +29,8 @@ class Configurator(QtGui.QMainWindow):
         self.spinBox_port.setValue(self.settings.value("port_name", 27).toInt()[0])
         self.controll_thread = None
         self.proto = None
-    
+        self.on_pushButton_reset_hand_clicked(1)
+
     @pyqtSlot(int)
     def on_spinBox_port_valueChanged(self, v):
         self.settings.setValue("port_name", v)
@@ -49,6 +52,7 @@ class Configurator(QtGui.QMainWindow):
     @pyqtSlot(bool)
     def on_pushButton_connect_clicked(self, v):
         '''Подключим руку'''
+
         if self.controll_thread is None:
             self.proto = HandProtocol(port="COM{0}".format(self.spinBox_port.value()), baudrate=128000)
             limmits = self.groupBox_settings.get_protocol_settings()
@@ -87,7 +91,38 @@ class Configurator(QtGui.QMainWindow):
                 #управление только при разблокировки
                 self.proto.move_servo(data[0], data[1])
 
-                
+    def on_cursor_move(self, camera, cur_pos, state):
+        if state == 0:
+            self.plain_pos = vector(self.scene_view.sphere.pos)
+        #плоскость x
+        if self.radioButton_plain_x.isChecked():
+            plain = (vector(1, 0, 0), self.plain_pos)
+            pos = camera.get_point_on_plain(cur_pos, plain)
+        elif self.radioButton_plain_y.isChecked():
+            plain = (vector(0, 1, 0), self.plain_pos)
+            pos = camera.get_point_on_plain(cur_pos, plain)        
+        elif self.radioButton_plain_z.isChecked():
+            plain = (vector(0, 0, 1), self.plain_pos)
+            pos = camera.get_point_on_plain(cur_pos, plain)        
+        else:
+            plain = (camera.get_plain()[0], self.plain_pos)
+            pos = camera.get_point_on_plain(cur_pos, plain)    
+
+        #начало смещения
+        if state == 0:
+            self.offset = self.plain_pos - pos
+        p = pos + self.offset
+        self.scene_view.sphere.pos = p
+        
+        #кинематика
+        if self.checkBox_kinematic.isChecked():
+            self.scene_view.set_hand_pos(p)
+    
+    @pyqtSlot(bool)
+    def on_pushButton_reset_hand_clicked(self, v):
+        self.scene_view.hand.set_save_state()
+        self.scene_view.sphere.pos = vector(0,-130,130)
+
 if __name__ == '__main__':
     import sys
     import logging

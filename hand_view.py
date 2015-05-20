@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from engine.scene_view import SceneView
 from hand import Hand
-from engine.sphere import sphere
 from PyQt4.QtCore import pyqtSlot, pyqtSignal
 import math
 
@@ -11,16 +10,13 @@ class HandView(SceneView):
     
     def __init__(self, parent=None):
         SceneView.__init__(self, parent)
-        self.cursor_move.connect(self.on_cursor_move)
         self.hand = Hand()
         self.hand.set_save_state()
-        self.sphere = sphere(radius=10)
-    
-    def on_cursor_move(self, camera, pos):
-        pos = camera.get_point_on_plain(pos, camera.get_plain())
-        self.sphere.pos = pos
+
+    def set_hand_pos(self, pos):
         self.hand.calk_ik_pos(pos)
         self.angles_changed.emit(self.hand.get_angles())
+
 
     def on_angle_changed(self, index, value):
         self.hand.set_angle(index, value)

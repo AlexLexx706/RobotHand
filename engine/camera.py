@@ -26,6 +26,7 @@ class camera(MyFrame):
                   eye_up[0], eye_up[1], eye_up[2])
     
     def get_plain(self):
+        '''возвращает плосоксть камеры: (нормаль, позицию)'''
         return vector(self.eye.get_matrix()[:3, 2] * -1.0), vector(self.get_matrix()[:3, 3])
 
     def move_eye(self, offset):
@@ -36,6 +37,7 @@ class camera(MyFrame):
         self.koleno.rotate(y, vector(1,0,0))
 
     def get_pos(self, pos):
+        '''Преобразует курсор pos в точку в плоскости камеры'''
         x = pos.x()
         y = pos.y()
         viewport = glGetIntegerv(GL_VIEWPORT)
@@ -46,9 +48,9 @@ class camera(MyFrame):
         return vector(gluUnProject(x, y, z, modelview, projection, viewport))
         
     def get_point_on_plain(self, m_pos, plain):
-        '''Возвращает точку на плоскости'''
+        '''Преобразует курсор m_pos в точку на плоскости'''
         n = vector(plain[0])
-        pos = vector(plain[0])
+        pos = vector(plain[1])
         p1 = self.get_pos(m_pos)
         p0 = self.eye.get_matrix()[:3, 3]
         d = n.dot(p1 - p0)

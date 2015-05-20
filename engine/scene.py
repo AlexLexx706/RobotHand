@@ -26,7 +26,7 @@ class Scene():
         for frame in self.frames:
             frame.update()
         
-        self.camera.update_camera()            
+        self.camera.update_camera()
 
     def initializeGL(self):
         lightPos = (200, 0.0, 2000.0, 1.0)
@@ -40,9 +40,7 @@ class Scene():
 
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glShadeModel(GL_SMOOTH)
-        
-
-        
+ 
     def resizeGL(self, width, height):
         glViewport(0,0, width, height)
         #side = min(width, height)

@@ -8,8 +8,8 @@ from sphere import sphere
 from scene import Scene
 
 class SceneView(QtOpenGL.QGLWidget):
-    #движение курсора
-    cursor_move = pyqtSignal(object, object)
+    #сигнал, движение курсора: Camera, QPoint, состояние: 0-начало, 1-движение, 2-конец
+    cursor_move = pyqtSignal(object, object, int)
     
     def __init__(self, parent=None):
         QtOpenGL.QGLWidget.__init__(self, parent)
@@ -20,7 +20,7 @@ class SceneView(QtOpenGL.QGLWidget):
         self.rotate_camera = False
         self.move_cursor = False
         self.old_cursore_pos = None
-        self.sphere = sphere(raduis=0.1)
+        self.sphere = sphere(radius=10)
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -41,7 +41,6 @@ class SceneView(QtOpenGL.QGLWidget):
 
     def update(self):
         self.updateGL()
-        #self.sphere.rotate(0.1, vector(1,0,0))
     
     def mouseMoveEvent(self, event):
         if self.scale_camera:
@@ -57,7 +56,7 @@ class SceneView(QtOpenGL.QGLWidget):
                 n_p = self.scene.camera.get_mouse_pos(event.pos() - self.old_cursore_pos)
                 self.scene.camera.pos -= (n_p - s_p)
             else:
-                self.cursor_move.emit(self.scene.camera, event.pos())
+                self.cursor_move.emit(self.scene.camera, event.pos(), 1)
         self.old_cursore_pos = event.pos()
     
     def mouseReleaseEvent(self, event):
@@ -67,6 +66,8 @@ class SceneView(QtOpenGL.QGLWidget):
             self.rotate_camera = False
         elif QtCore.Qt.LeftButton == event.button():
             self.move_cursor = False
+            if not (event.modifiers() & QtCore.Qt.ShiftModifier):
+                self.cursor_move.emit(self.scene.camera, event.pos(), 2)
 
     def mousePressEvent(self, event):
         self.old_cursore_pos = event.pos()
@@ -81,7 +82,7 @@ class SceneView(QtOpenGL.QGLWidget):
             if event.modifiers() & QtCore.Qt.ShiftModifier:
                 self.old_3d_cur_pos = self.scene.camera.get_mouse_pos(event.pos())
             else:
-                self.cursor_move.emit(self.scene.camera, event.pos())
+                self.cursor_move.emit(self.scene.camera, event.pos(), 0)
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

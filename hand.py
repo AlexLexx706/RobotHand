@@ -59,10 +59,10 @@ class Hand:
         #мап фукнций
         self.fun_map = {
             1: {"set_angle": self.b0.set_angle_x, "get_angle": self.b0.get_angle_x, "enable": True, "set_freedom": self.b0.set_freedom_x_angle, "get_freedom":self.b0.get_freedom_x_angle},
-            2: {"set_angle": self.b1.set_angle_z, "get_angle": self.b1.get_angle_z, "enable": True, "set_freedom": self.b0.set_freedom_z_angle, "get_freedom":self.b0.get_freedom_y_angle},
-            3: {"set_angle": self.b2.set_angle_y, "get_angle": self.b2.get_angle_y, "enable": True, "set_freedom": self.b0.set_freedom_y_angle, "get_freedom":self.b0.get_freedom_y_angle},
-            4: {"set_angle": self.b3.set_angle_z, "get_angle": self.b3.get_angle_z, "enable": True, "set_freedom": self.b0.set_freedom_z_angle, "get_freedom":self.b0.get_freedom_z_angle},
-            5: {"set_angle": self.b4.set_angle_y, "get_angle": self.b4.get_angle_y, "enable": True, "set_freedom": self.b0.set_freedom_y_angle, "get_freedom":self.b0.get_freedom_y_angle},
+            2: {"set_angle": self.b1.set_angle_z, "get_angle": self.b1.get_angle_z, "enable": True, "set_freedom": self.b1.set_freedom_z_angle, "get_freedom":self.b1.get_freedom_y_angle},
+            3: {"set_angle": self.b2.set_angle_y, "get_angle": self.b2.get_angle_y, "enable": True, "set_freedom": self.b2.set_freedom_y_angle, "get_freedom":self.b2.get_freedom_y_angle},
+            4: {"set_angle": self.b3.set_angle_z, "get_angle": self.b3.get_angle_z, "enable": True, "set_freedom": self.b3.set_freedom_z_angle, "get_freedom":self.b3.get_freedom_z_angle},
+            5: {"set_angle": self.b4.set_angle_y, "get_angle": self.b4.get_angle_y, "enable": True, "set_freedom": self.b4.set_freedom_y_angle, "get_freedom":self.b4.get_freedom_y_angle},
             6: {"set_angle": self.set_sponge_value, "get_angle": self.get_sponge_value, "enable": True, "set_freedom": self.set_sponge_freedom, "get_freedom":self.get_sponge_freedom}
         }
     
@@ -159,7 +159,7 @@ class Hand:
         '''Установить пределы, сервисная функция'''
         if index not in self.fun_map:
             raise self.WrongIndexError(index)
-
+        print "set_angle_range_changed:", index, min, max
         if min > max:
             m = max
             max = min

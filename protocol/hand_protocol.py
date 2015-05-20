@@ -40,7 +40,7 @@ class HandProtocol(protocol.Protocol):
         
         #делаем поворот
         v = (angle - limmit[0][0]) / (limmit[1][0] - limmit[0][0]) * (limmit[1][1] - limmit[0][1]) + limmit[0][1]
-        self.move_servo(index, int(v), time_move_sec=0.05)
+        self.move_servo(index, int(v), time_move_sec=0.1)
 
     def get_angle(self, index, angle):
         if index not in self.limmits:
@@ -61,7 +61,7 @@ class HandProtocol(protocol.Protocol):
     def move_hand(self, angles):
         with self.lock:
             data = [self.get_angle(index, angle) for index, angle in angles]
-        self.move_servos(data, 0.05)
+        self.move_servos(data, 0.1)
 
 if __name__ == "__main__":
     import time
