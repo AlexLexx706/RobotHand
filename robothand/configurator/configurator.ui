@@ -239,13 +239,13 @@
   <customwidget>
    <class>ServosSettings</class>
    <extends>QGroupBox</extends>
-   <header>servos_settings.servos_settings</header>
+   <header>robothand.servos_settings.servos_settings</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>HandView</class>
    <extends>QWidget</extends>
-   <header>hand_view</header>
+   <header>robothand.hand_view</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

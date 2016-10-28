@@ -71,7 +71,7 @@ class vector(np.ndarray):
         return np.array(data_x, dtype=np.dtype(float)).view(subtype)
 
     def cross(self, v):
-        return np.cross(self, v)
+        return np.cross(self, v).view(vector)
 
     def __getattr__(self, name):
         if name == "mag":

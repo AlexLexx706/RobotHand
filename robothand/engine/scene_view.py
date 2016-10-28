@@ -3,14 +3,16 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
+from PyQt4.QtCore import pyqtSignal
 from sphere import sphere
 from scene import Scene
 
+
 class SceneView(QtOpenGL.QGLWidget):
-    #сигнал, движение курсора: Camera, QPoint, состояние: 0-начало, 1-движение, 2-конец
+    # сигнал, движение курсора:
+    # Camera, QPoint, состояние: 0-начало, 1-движение, 2-конец
     cursor_move = pyqtSignal(object, object, int)
-    
+
     def __init__(self, parent=None):
         QtOpenGL.QGLWidget.__init__(self, parent)
         self.timer = QtCore.QTimer(self)
@@ -21,7 +23,7 @@ class SceneView(QtOpenGL.QGLWidget):
         self.move_cursor = False
         self.old_cursore_pos = None
         self.sphere = sphere(radius=10)
-    
+
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
 
@@ -41,24 +43,26 @@ class SceneView(QtOpenGL.QGLWidget):
 
     def update(self):
         self.updateGL()
-    
+
     def mouseMoveEvent(self, event):
         if self.scale_camera:
             offset = (event.pos() - self.old_cursore_pos).y()
-            self.scene.camera.move_eye(offset*2)
+            self.scene.camera.move_eye(offset * 2)
         elif self.rotate_camera:
             offset = event.pos() - self.old_cursore_pos
-            self.scene.camera.rotate_camera(-offset.x()*0.001, -offset.y()*0.001)
+            self.scene.camera.rotate_camera(
+                -offset.x() * 0.001, -offset.y() * 0.001)
         elif self.move_cursor:
-            #сдвиг камеры
+            # сдвиг камеры
             if event.modifiers() & QtCore.Qt.ShiftModifier:
-                s_p = self.scene.camera.get_mouse_pos(QtCore.QPoint(0,0))
-                n_p = self.scene.camera.get_mouse_pos(event.pos() - self.old_cursore_pos)
+                s_p = self.scene.camera.get_mouse_pos(QtCore.QPoint(0, 0))
+                n_p = self.scene.camera.get_mouse_pos(
+                    event.pos() - self.old_cursore_pos)
                 self.scene.camera.pos -= (n_p - s_p)
             else:
                 self.cursor_move.emit(self.scene.camera, event.pos(), 1)
         self.old_cursore_pos = event.pos()
-    
+
     def mouseReleaseEvent(self, event):
         if QtCore.Qt.MidButton == event.button():
             self.scale_camera = False
@@ -72,7 +76,7 @@ class SceneView(QtOpenGL.QGLWidget):
     def mousePressEvent(self, event):
         self.old_cursore_pos = event.pos()
 
-        #средняя кнопка
+        # средняя кнопка
         if QtCore.Qt.MidButton == event.button():
             self.scale_camera = True
         elif QtCore.Qt.RightButton == event.button():
@@ -80,14 +84,14 @@ class SceneView(QtOpenGL.QGLWidget):
         elif QtCore.Qt.LeftButton == event.button():
             self.move_cursor = True
             if event.modifiers() & QtCore.Qt.ShiftModifier:
-                self.old_3d_cur_pos = self.scene.camera.get_mouse_pos(event.pos())
+                self.old_3d_cur_pos = self.scene.camera.get_mouse_pos(
+                    event.pos())
             else:
                 self.cursor_move.emit(self.scene.camera, event.pos(), 0)
-    
+
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainWin = GLWidget()
     mainWin.show()
-    sys.exit(app.exec_())    
-
-        
+    sys.exit(app.exec_())

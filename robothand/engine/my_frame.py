@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
 from matplotlib.rcsetup import validate_nseq_float
 import numpy as np
 from scene import Scene
 import transformations
 from vector import *
+
+LOG = logging.getLogger(__name__)
 
 
 class MyFrame:

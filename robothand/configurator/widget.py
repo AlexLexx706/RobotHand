@@ -1,16 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
-from protocol.hand_protocol import HandProtocol
 import os
 import threading
 import Queue
 import logging
-from engine import vector
+import sys
+from PyQt4 import QtGui, uic
+from PyQt4.QtCore import pyqtSlot
+from robothand.protocol.hand_protocol import HandProtocol
+from robothand.engine import vector
 
-
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class Configurator(QtGui.QMainWindow):
@@ -146,10 +146,7 @@ class Configurator(QtGui.QMainWindow):
         self.scene_view.sphere.pos = vector(0, -130, 130)
 
 
-if __name__ == '__main__':
-    import sys
-    import logging
-
+def main():
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s %(message)s',
         level=logging.DEBUG)
@@ -160,3 +157,7 @@ if __name__ == '__main__':
     app.installEventFilter(widget)
     widget.show()
     app.exec_()
+
+
+if __name__ == "__main__":
+    main()
