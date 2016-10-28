@@ -2,15 +2,19 @@
 from OpenGL.GL import *
 from my_frame import MyFrame
 
+
 class base_shape(MyFrame):
     def __init__(self, **kwargs):
-        '''radius = 1, length = 1 segments = 10, color=(1, 1, 1), pos=(0, 0, 0), axis=(1, 0, 0), up=(0, 1, 0)'''
+        """
+            radius = 1, length = 1 segments = 10,
+            color=(1, 1, 1), pos=(0, 0, 0), axis=(1, 0, 0), up=(0, 1, 0)
+        """
         MyFrame.__init__(self, **kwargs)
-        self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)       
+        self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)
         self.list_id = None
         self.visible = True
         self.first_make = True
-    
+
     def make(self):
         pass
 
@@ -20,7 +24,7 @@ class base_shape(MyFrame):
         MyFrame.remove(self)
 
     def update(self):
-        #построение
+        # построение
         if self.first_make:
             if self.list_id is None:
                 self.list_id = glGenLists(1)
@@ -32,7 +36,6 @@ class base_shape(MyFrame):
             glColor(self.color)
             glCallList(self.list_id)
 
+
 if __name__ == '__main__':
     base_shape()
-
-        

@@ -4,7 +4,7 @@ from PyQt4 import QtCore, QtGui, uic
 from PyQt4.QtCore import pyqtSlot, pyqtSignal
 from protocol.hand_protocol import HandProtocol
 import os
-import threading 
+import threading
 import Queue
 import logging
 from engine import vector
@@ -12,34 +12,40 @@ from engine import vector
 
 logger = logging.getLogger(__name__)
 
+
 class Configurator(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(QtGui.QMainWindow, self).__init__(parent)
-        uic.loadUi(os.path.join(os.path.split(__file__)[0], "configurator.ui"), self)
+        uic.loadUi(os.path.join(os.path.split(
+            __file__)[0], "configurator.ui"), self)
         self.settings = self.groupBox_settings.settings
-        self.groupBox_settings.angle_changed.connect(self.scene_view.on_angle_changed)
-        self.groupBox_settings.enable_angle_changed.connect(self.scene_view.on_enable_angle_changed)
-        self.groupBox_settings.angle_range_changed.connect(self.scene_view.on_angle_range_changed)
+        self.groupBox_settings.angle_changed.connect(
+            self.scene_view.on_angle_changed)
+        self.groupBox_settings.enable_angle_changed.connect(
+            self.scene_view.on_enable_angle_changed)
+        self.groupBox_settings.angle_range_changed.connect(
+            self.scene_view.on_angle_range_changed)
         self.scene_view.cursor_move.connect(self.on_cursor_move)
-        
+
         self.groupBox_settings.range_changed.connect(self.on_range_changed)
         self.groupBox_settings.value_changed.connect(self.on_value_changed)
-        self.scene_view.angles_changed.connect(self.groupBox_settings.on_angles_changed)
-        
-        self.spinBox_port.setValue(self.settings.value("port_name", 27).toInt()[0])
+        self.scene_view.angles_changed.connect(
+            self.groupBox_settings.on_angles_changed)
+
+        self.spinBox_port.setValue(
+            self.settings.value("port_name", 27).toInt()[0])
         self.controll_thread = None
         self.proto = None
         self.on_pushButton_reset_hand_clicked(1)
 
     def closeEvent(self, event):
         self.scene_view.timer.stop()
-        #event.accept()
- 
-        
+        # event.accept()
+
     @pyqtSlot(int)
     def on_spinBox_port_valueChanged(self, v):
         self.settings.setValue("port_name", v)
-    
+
     def on_range_changed(self, index, value):
         if self.proto is not None:
             print "on_range_changed", index, value
@@ -50,20 +56,21 @@ class Configurator(QtGui.QMainWindow):
             print "on_value_changed", index, value
 
             self.scene_view.hand.cmd_queue.put((2, (index, value)))
-    
+
     def get_enable_angle(self, index):
         return self.scene_view.hand.get_enable_angle(index)
-            
+
     @pyqtSlot(bool)
     def on_pushButton_connect_clicked(self, v):
         '''Подключим руку'''
 
         if self.controll_thread is None:
-            self.proto = HandProtocol(port="COM{0}".format(self.spinBox_port.value()), baudrate=128000)
+            self.proto = HandProtocol(port="COM{0}".format(
+                self.spinBox_port.value()), baudrate=128000)
             limmits = self.groupBox_settings.get_protocol_settings()
 
             for index in limmits:
-                self.proto.set_limmit(index , limmits[index])
+                self.proto.set_limmit(index, limmits[index])
 
             self.spinBox_port.setEnabled(False)
             self.scene_view.hand.cmd_queue = Queue.Queue()
@@ -87,37 +94,37 @@ class Configurator(QtGui.QMainWindow):
             if data is None:
                 return
             cmd, data = data
-            
+
             if cmd == 0:
                 self.proto.rotate(*data)
             elif cmd == 1:
                 self.proto.move_hand(data)
             elif cmd == 2:
-                #управление только при разблокировки
+                # управление только при разблокировки
                 self.proto.move_servo(data[0], data[1])
 
     def on_cursor_move(self, camera, cur_pos, state):
         if state == 0:
             self.plain_pos = vector(self.scene_view.sphere.pos)
-        #плоскость x
+        # плоскость x
         if self.radioButton_plain_x.isChecked():
             plain = (vector(1, 0, 0), self.plain_pos)
             pos = camera.get_point_on_plain(cur_pos, plain)
         elif self.radioButton_plain_y.isChecked():
             plain = (vector(0, 1, 0), self.plain_pos)
-            pos = camera.get_point_on_plain(cur_pos, plain)        
+            pos = camera.get_point_on_plain(cur_pos, plain)
         elif self.radioButton_plain_z.isChecked():
             plain = (vector(0, 0, 1), self.plain_pos)
-            pos = camera.get_point_on_plain(cur_pos, plain)        
+            pos = camera.get_point_on_plain(cur_pos, plain)
         else:
             plain = (camera.get_plain()[0], self.plain_pos)
-            pos = camera.get_point_on_plain(cur_pos, plain)    
+            pos = camera.get_point_on_plain(cur_pos, plain)
 
-        #начало смещения
+        # начало смещения
         if state == 0:
             self.offset = self.plain_pos - pos
         new_pos = pos + self.offset
-        
+
         if not self.checkBox_o_x.isChecked():
             new_pos[0] = self.plain_pos[0]
 
@@ -126,25 +133,28 @@ class Configurator(QtGui.QMainWindow):
 
         if not self.checkBox_o_z.isChecked():
             new_pos[2] = self.plain_pos[2]
-        
+
         self.scene_view.sphere.pos = new_pos
-        
-        #кинематика
+
+        # кинематика
         if self.checkBox_kinematic.isChecked():
             self.scene_view.set_hand_pos(new_pos)
-    
+
     @pyqtSlot(bool)
     def on_pushButton_reset_hand_clicked(self, v):
         self.scene_view.hand.set_save_state()
-        self.scene_view.sphere.pos = vector(0,-130,130)
+        self.scene_view.sphere.pos = vector(0, -130, 130)
+
 
 if __name__ == '__main__':
     import sys
     import logging
-    
-    logging.basicConfig(format='%(levelname)s %(name)s::%(funcName)s %(message)s', level=logging.DEBUG)
+
+    logging.basicConfig(
+        format='%(levelname)s %(name)s::%(funcName)s %(message)s',
+        level=logging.DEBUG)
     logging.getLogger("PyQt4").setLevel(logging.INFO)
-    
+
     app = QtGui.QApplication(sys.argv)
     widget = Configurator()
     app.installEventFilter(widget)
