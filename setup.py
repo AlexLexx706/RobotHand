@@ -14,7 +14,7 @@ setup(
         ],
     },
     package_data={
-        'allarm_server.admin': [
+        'robothand': [
             'configurator/*.ui',
             'servos_settings/*.ui']
     },
