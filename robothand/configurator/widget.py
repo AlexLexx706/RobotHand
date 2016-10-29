@@ -18,6 +18,8 @@ class Configurator(QtGui.QMainWindow):
         super(QtGui.QMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(
             __file__)[0], "configurator.ui"), self)
+        #self.scene_view.initializeGL()
+
         self.settings = self.groupBox_settings.settings
         self.groupBox_settings.angle_changed.connect(
             self.scene_view.on_angle_changed)
