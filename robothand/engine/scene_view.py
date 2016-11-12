@@ -38,6 +38,9 @@ class SceneView(QtOpenGL.QGLWidget):
     def paintGL(self):
         self.scene.update()
 
+    def resizeEvent(self, event):
+        QtOpenGL.QGLWidget.resizeEvent(self, event)
+
     def resizeGL(self, width, height):
         self.scene.resizeGL(width, height)
 

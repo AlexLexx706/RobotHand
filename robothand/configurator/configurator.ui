@@ -49,20 +49,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="spinBox_port"/>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>301</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            <widget class="QLineEdit" name="lineEdit_port_name"/>
            </item>
            <item>
             <widget class="QPushButton" name="pushButton_connect">

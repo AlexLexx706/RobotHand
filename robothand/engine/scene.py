@@ -44,7 +44,7 @@ class Scene():
 
     def resizeGL(self, width, height):
         glViewport(0, 0, width, height)
-        # side = min(width, height)
-        # if side < 0:
-        #    return
-        # glViewport((width - side) / 2, (height - side) / 2, side, side)
+        side = min(width, height)
+        if side < 0:
+           return
+        glViewport((width - side) / 2, (height - side) / 2, side, side)
