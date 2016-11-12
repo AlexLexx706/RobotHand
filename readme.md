@@ -30,3 +30,8 @@
 Запуск:
 -------
 windows: venv\Scripts\configurator.exe
+
+
+Вид:
+---
+![alt tag](https://github.com/AlexLexx706/RobotHand/blob/master/screenshot.png)
