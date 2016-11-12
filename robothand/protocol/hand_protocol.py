@@ -22,11 +22,13 @@ class HandProtocol(protocol.Protocol):
         self.lock = threading.Lock()
 
     def set_limmit(self, index, limmits):
+        LOG.debug('index: %s limmits: %s' % (index, limmits))
         with self.lock:
             if index in self.limmits:
                 self.limmits[index] = limmits
 
     def rotate(self, index, angle):
+        LOG.debug('index: %s angle: %s' % (index, angle))
         with self.lock:
             if index not in self.limmits:
                 RuntimeError("wrong index:{}".format(index))
@@ -45,6 +47,7 @@ class HandProtocol(protocol.Protocol):
         self.move_servo(index, int(v), time_move_sec=0.1)
 
     def get_angle(self, index, angle):
+        LOG.debug('index: %s angle: %s' % (index, angle))
         if index not in self.limmits:
             RuntimeError("wrong index:{}".format(index))
 
@@ -61,6 +64,8 @@ class HandProtocol(protocol.Protocol):
             (limmit[1][1] - limmit[0][1]) + limmit[0][1]
 
     def move_hand(self, angles):
+        LOG.debug('angles: %s' % (angles,))
+
         with self.lock:
             data = [self.get_angle(index, angle) for index, angle in angles]
         self.move_servos(data, 0.1)

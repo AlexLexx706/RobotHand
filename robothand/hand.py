@@ -4,6 +4,10 @@ from __future__ import division
 from engine import *
 import time
 import math
+import logging
+
+
+LOG = logging.getLogger(__name__)
 
 
 def atr(angle):
@@ -12,6 +16,7 @@ def atr(angle):
 
 class Hand:
     '''Рука'''
+    save_state = ((1, 0), (2, 0), (3, atr(-90)), (4, atr(150)), (5, 0), (6, 85))
 
     class WrongIndexError(Exception):
         '''Ошибка не верный индекс'''
@@ -110,9 +115,11 @@ class Hand:
                 "set_freedom": self.set_sponge_freedom,
                 "get_freedom": self.get_sponge_freedom}
         }
+        self.set_save_state()
 
     def set_sponge_freedom(self, freedom):
         '''установим перделы хода схвата'''
+        LOG.debug('freedom: %s' % (freedom, ))
         self.sponge_angle_range = freedom
 
     def get_sponge_freedom(self):
@@ -120,6 +127,7 @@ class Hand:
 
     def set_sponge_value(self, angle):
         '''Установить сжатие схвата'''
+        LOG.debug('angle: %s' % (angle, ))
         if angle < self.sponge_angle_range[0]:
             angle = self.sponge_angle_range[0]
 
@@ -147,12 +155,8 @@ class Hand:
 
     def set_save_state(self):
         '''Установить манипулятор в безопасное положение'''
-        self.fun_map[1]["set_angle"](0)
-        self.fun_map[2]["set_angle"](0)
-        self.fun_map[3]["set_angle"](atr(-90))
-        self.fun_map[4]["set_angle"](atr(150))
-        self.fun_map[5]["set_angle"](0)
-        self.fun_map[6]["set_angle"](85)
+        for i, angle in self.save_state:
+            self.fun_map[i]["set_angle"](angle)
 
         if self.cmd_queue is not None:
             self.cmd_queue.put((1, [
@@ -180,14 +184,16 @@ class Hand:
 
     def get_angles(self):
         '''Получить углы, сервисная функция'''
-        return [[k, self.fun_map[k]["get_angle"]()] for k in self.fun_map]
+        return sorted(
+            (k, self.fun_map[k]["get_angle"]()) for k in self.fun_map)
 
     def set_angle(self, index, value):
         '''Установить углы, сервисная функция'''
+        LOG.debug('index: %s value: %s' % (index, value))
+
         if index not in self.fun_map:
             raise self.WrongIndexError(index)
 
-        print "set_angle", index, value
         self.fun_map[index]["set_angle"](value)
 
         if self.cmd_queue is not None and self.fun_map[index]["enable"]:
@@ -196,9 +202,10 @@ class Hand:
 
     def set_enable_angle(self, index, e):
         '''Установить разрешение генерить комманды'''
+        LOG.debug('index: %s e: %s' % (index, e,))
+
         if index in self.fun_map:
             self.fun_map[index]["enable"] = e
-            print index, e
 
     def get_enable_angle(self, index):
         '''Возвращает разрешение'''
@@ -207,17 +214,18 @@ class Hand:
 
         return self.fun_map[index]["enable"]
 
-    def set_angle_range_changed(self, index, min, max):
+    def set_angle_range_changed(self, index, _min, _max):
         '''Установить пределы, сервисная функция'''
+        LOG.debug('index: %s _min: %s _max:%s' % (index, _min, _max))
+
         if index not in self.fun_map:
             raise self.WrongIndexError(index)
-        print "set_angle_range_changed:", index, min, max
-        if min > max:
-            m = max
-            max = min
-            min = m
+        if _min > _max:
+            m = _max
+            _max = _min
+            _min = m
 
-        self.fun_map[index]["set_freedom"]((min, max))
+        self.fun_map[index]["set_freedom"]((_min, _max))
 
     def get_target_pos(self):
         '''Получить точку конца манипулятора'''

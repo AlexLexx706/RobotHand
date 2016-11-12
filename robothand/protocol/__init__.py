@@ -14,6 +14,7 @@ class Protocol:
         self.connect(port, baudrate)
 
     def connect(self, port, baudrate):
+        LOG.debug('port: %s, baudrate: %s' % (port, baudrate))
         if self.serial is not None:
             self.serial.close()
             self.serial = None
@@ -22,6 +23,7 @@ class Protocol:
         self.serial.write('#VERIFY\n\r')
 
     def close(self):
+        LOG.debug('')
         if self.serial is not None:
             self.serial.close()
             self.serial = None

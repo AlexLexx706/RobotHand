@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>393</width>
-    <height>77</height>
+    <height>79</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -209,7 +209,7 @@
       <number>500</number>
      </property>
      <property name="maximum">
-      <number>2500</number>
+      <number>3000</number>
      </property>
     </widget>
    </item>
@@ -311,22 +311,5 @@
   <tabstop>doubleSpinBox_max_angle</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>horizontalSlider_value</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_value</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>236</x>
-     <y>35</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>313</x>
-     <y>28</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

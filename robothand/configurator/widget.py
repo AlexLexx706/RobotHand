@@ -9,6 +9,8 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSlot
 from robothand.protocol.hand_protocol import HandProtocol
 from robothand.engine import vector
+import time
+
 
 LOG = logging.getLogger(__name__)
 
@@ -18,8 +20,7 @@ class Configurator(QtGui.QMainWindow):
         super(QtGui.QMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(
             __file__)[0], "configurator.ui"), self)
-        #self.scene_view.initializeGL()
-
+        self.save_state_thread = None
         self.settings = self.groupBox_settings.settings
         self.groupBox_settings.angle_changed.connect(
             self.scene_view.on_angle_changed)
@@ -38,7 +39,14 @@ class Configurator(QtGui.QMainWindow):
             self.settings.value("port_name", '27').toString())
         self.controll_thread = None
         self.proto = None
-        self.on_pushButton_reset_hand_clicked(1)
+
+        for index, limmit in\
+                self.groupBox_settings.get_protocol_settings().items():
+            self.scene_view.hand.set_angle_range_changed(
+                index, limmit[0][0], limmit[1][0])
+
+        self.scene_view.hand.set_save_state()
+        self.scene_view.sphere.pos = vector(0, -130, 130)
 
     def closeEvent(self, event):
         self.scene_view.timer.stop()
@@ -50,12 +58,9 @@ class Configurator(QtGui.QMainWindow):
 
     def on_range_changed(self, index, value):
         if self.proto is not None:
-            print "on_range_changed", index, value
             self.proto.set_limmit(index, value)
 
     def on_value_changed(self, index, value):
-        print "on_value_changed", index, value, self.get_enable_angle(index), self.proto is not None
-
         if self.proto is not None and not self.get_enable_angle(index):
             self.scene_view.hand.cmd_queue.put((2, (index, value)))
 
@@ -69,10 +74,11 @@ class Configurator(QtGui.QMainWindow):
         if self.controll_thread is None:
             self.proto = HandProtocol(port=str(
                 self.lineEdit_port_name.text()), baudrate=128000)
-            limmits = self.groupBox_settings.get_protocol_settings()
-
-            for index in limmits:
-                self.proto.set_limmit(index, limmits[index])
+            for index, limmit in\
+                    self.groupBox_settings.get_protocol_settings().items():
+                self.proto.set_limmit(index, limmit)
+                self.scene_view.hand.set_angle_range_changed(
+                    index, limmit[0][0], limmit[1][0])
 
             self.lineEdit_port_name.setEnabled(False)
             self.scene_view.hand.cmd_queue = Queue.Queue()
@@ -91,20 +97,22 @@ class Configurator(QtGui.QMainWindow):
     def proto_proc(self):
         '''Обработка комманд'''
         while 1:
-            data = self.scene_view.hand.cmd_queue.get()
+            try:
+                data = self.scene_view.hand.cmd_queue.get()
 
-            if data is None:
-                return
-            cmd, data = data
+                if data is None:
+                    return
+                cmd, data = data
 
-            if cmd == 0:
-                self.proto.rotate(*data)
-            elif cmd == 1:
-                self.proto.move_hand(data)
-            elif cmd == 2:
-                # управление только при разблокировки
-                print 'SASASAMBA: ', data[0], data[1], 0.1
-                self.proto.move_servo(data[0], data[1], 0.1)
+                if cmd == 0:
+                    self.proto.rotate(*data)
+                elif cmd == 1:
+                    self.proto.move_hand(data)
+                elif cmd == 2:
+                    # управление только при разблокировки
+                    self.proto.move_servo(data[0], data[1], 0.1)
+            except Exception as e:
+                LOG.warning(e)
 
     def on_cursor_move(self, camera, cur_pos, state):
         if state == 0:
@@ -145,8 +153,32 @@ class Configurator(QtGui.QMainWindow):
 
     @pyqtSlot(bool)
     def on_pushButton_reset_hand_clicked(self, v):
-        self.scene_view.hand.set_save_state()
-        self.scene_view.sphere.pos = vector(0, -130, 130)
+        if not self.save_state_thread:
+            self.scene_view.sphere.pos = vector(0, -130, 130)
+            self.save_state_thread = threading.Thread(
+                target=self.save_state_thread_proc)
+            self.save_state_thread.start()
+
+    def save_state_thread_proc(self):
+        start_angles = self.scene_view.hand.get_angles()
+        dt = 0.05
+        count = int(1.0 / dt * 2.5)
+
+        steps = [
+            (end[1] - start[1]) / count
+            for start, end in zip(
+                start_angles, self.scene_view.hand.save_state)]
+        LOG.debug('dt: %s start_angles: %s count: %s steps: %s' % (
+            dt, start_angles, count, steps))
+
+        i = 1
+        while (i < count):
+            for start_angle, step in zip(start_angles, steps):
+                self.scene_view.hand.set_angle(
+                    start_angle[0], start_angle[1] + step * i)
+            time.sleep(dt)
+            i += 1
+        self.save_state_thread = None
 
 
 def main():
