@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m robothand.configurator.widget
+venv/bin/python -m robothand.configurator.widget

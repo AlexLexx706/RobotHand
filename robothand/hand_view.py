@@ -2,6 +2,8 @@
 from engine.scene_view import SceneView
 from hand import Hand
 from PyQt4.QtCore import pyqtSlot, pyqtSignal
+import logging
+LOG = logging.getLogger()
 
 
 class HandView(SceneView):
@@ -18,7 +20,10 @@ class HandView(SceneView):
         self.angles_changed.emit(self.hand.get_angles())
 
     def on_angle_changed(self, index, value):
-        self.hand.set_angle(index, value)
+        try:
+            self.hand.set_angle(index, value)
+        except Hand.WrongIndexError as e:
+            LOG.debug(e)
 
     def on_enable_angle_changed(self, index, e):
         self.hand.set_enable_angle(index, e)
