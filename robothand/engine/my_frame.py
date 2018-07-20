@@ -14,7 +14,7 @@ class MyFrame:
     def __init__(
             self,
             parent=None,
-            pos=vector(0., 0., 0.),
+            pos=vector(0.0, 0.0, 0.0),
             axis=vector(1.0, 0.0, 0.0),
             up=None):
         """
@@ -27,42 +27,20 @@ class MyFrame:
         """
         self.parent = kwargs["parent"] if "parent" in kwargs else None
 
+        axis.norm()
+
         # Определение осей
-        if "axis" in kwargs:
-            axis = norm(vector(kwargs["axis"]))
-            up = vector(0.0, 1.0, 0.0) if "up" not in kwargs else vector(
-                kwargs["up"]).norm()
-            up = axis.cross(up).cross(axis)
+        up = vector(0.0, 1.0, 0.0) if up is None else up.norm()
+        up = axis.cross(up).cross(axis)
 
-            if up.mag == 0:
-                up = vector(-1.0, 0.0, 0.0)
-        else:
-            if "up" not in kwargs:
-                axis = vector(1.0, 0.0, 0.0)
-                up = vector(0.0, 1.0, 0.0)
-            else:
-                up = norm(vector(kwargs["up"]))
-                axis = kwargs.cross((0.0, 1.0, 0.0)).cross(up)
-                if axis.mag == 0:
-                    axis = vector(1.0, 0.0, 0.0)
+        if up.mag == 0:
+            up = vector(-1.0, 0.0, 0.0)
 
-        pos = vector(0.0, 0.0, 0.0) if "pos" not in kwargs else vector(
-            kwargs["pos"])
-
-        if "x" in kwargs:
-            pos[0] = kwargs[0]
-
-        if "y" in kwargs:
-            pos[1] = kwargs[1]
-
-        if "z" in kwargs:
-            pos[2] = kwargs[2]
-
-        self.matrix = np.identity(4)
-        self.matrix[:3, 0] = axis
-        self.matrix[:3, 1] = up
-        self.matrix[:3, 2] = axis.cross(up)
-        self.matrix[:3, 3] = pos
+        self._matrix = np.identity(4)
+        self._matrix[:3, 0] = axis
+        self._matrix[:3, 1] = up
+        self._matrix[:3, 2] = axis.cross(up)
+        self._matrix[:3, 3] = pos
 
         self.scene = Scene.GetCurScene()
         self.scene.frames.append(self)
@@ -71,22 +49,34 @@ class MyFrame:
         if self.parent is not None:
             self.parent.childs.append(self)
 
-    def __getattr__(self, name):
-        if name == "axis":
-            return self.matrix[:3, 0].view(vector)
-        elif name == "up":
-            return self.matrix[:3, 1].view(vector)
-        elif name == "pos":
-            return self.matrix[:3, 3].view(vector)
-        raise AttributeError()
+    @property
+    def axis(self):
+        '''орт оси x'''
+        return self._matrix[:3, 0].view(vector)
 
-    def __setattr__(self, name, value):
-        if name == "pos":
-            self.matrix[:3, 3] = value
-        else:
-            self.__dict__[name] = value
+    @property
+    def up(self):
+        '''орт оси y'''
+        return self._matrix[:3, 1].view(vector)
+
+    @property
+    def pos(self):
+        '''позиция в локальных координатах'''
+        return self._matrix[:3, 3].view(vector)
+
+    @pos.setter
+    def set_pos(self, pos):
+        '''установит позицию в локальных координатах'''
+        self._matrix[:3, 3] = value
+
+    @property
+    def matrix(self):
+        '''Возвращает матрицу фрейма'''
+        return self._matrix if self.parent is None else\
+            self.parent.matrix.dot(self._matrix)
 
     def remove(self):
+        '''Удалить со сцены'''
         self.scene.frames.remove(self)
 
         for ch in self.childs:
@@ -95,16 +85,6 @@ class MyFrame:
         if self.parent is not None:
             self.parent.childs.remove(self)
         self.childs = []
-
-    def __del__(self):
-        print "REMOVE my_frame"
-
-    def get_matrix(self):
-        u'''Возвращает матрицу фрейма'''
-        if self.parent is None:
-            return self.matrix
-
-        return self.parent.get_matrix().dot(self.matrix)
 
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''
@@ -122,13 +102,21 @@ class MyFrame:
         return vector(m.T.dot(np.array((pos[0], pos[1], pos[2], 0.)))[:3])
 
     def rotate(self, angle, axis, point=None):
-        pos = self.matrix[:3, 3].copy()
-        self.matrix[:3, 3] = (0, 0, 0)
+        '''
+            вращать во круг заданной оси axis
+            относительно заданной точки point
+            на угол angle
+        '''
+        pos = self._matrix[:3, 3].copy()
+        self._matrix[:3, 3] = (0, 0, 0)
         r_m = transformations.rotation_matrix(angle, axis, point)
-        self.matrix = r_m.dot(self.matrix)
-        self.matrix[:3, 3] = pos
+        self._matrix = r_m.dot(self._matrix)
+        self._matrix[:3, 3] = pos
 
     def update(self):
+        '''
+            Вызывается сценой нужно использовать для
+            обновления внутренней логики'''
         pass
 
 
