@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from base_shape import base_shape
-from vector import *
+import base_shape
+import vector
 
 
-class cylinder(base_shape):
+class Cylinder(base_shape.BaseShape):
     def __init__(self, **kwargs):
         """
             radius = 1, length = 1 segments = 10,
             color=(1, 1, 1), pos=(0, 0, 0),
             axis=(1, 0, 0), up=(0, 1, 0)
         """
-        base_shape.__init__(self, **kwargs)
+        base_shape.BaseShape.__init__(self, **kwargs)
 
         self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)
         self.radius = kwargs["radius"] if "radius" in kwargs else 1
         self.length = kwargs["length"] if "length" in kwargs else (
-            1.0 if "axis" not in kwargs else vector(kwargs["axis"]).mag)
+            1.0 if "axis" not in kwargs else vector.Vector(kwargs["axis"]).mag)
         self.segments = kwargs["segments"] if "segments" in kwargs else 10
 
     def make(self):

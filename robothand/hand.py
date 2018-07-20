@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import division
-from engine import *
+from engine import box
+from engine import bone
+from engine import cylinder
+from engine import vector
+
 import time
 import math
 import logging
@@ -29,52 +33,70 @@ class Hand:
         self.sponge_angle_range = (0, atr(85))
         self.max_sponge_move = 55.0 / 2.0
 
-        self.base = Bone()
-        self.base_box = box(pos=(95 / 2, 25, 0),
-                            length=95, height=75, width=75)
-        self.base_table = box(pos=(0, -218 - 5, 0),
-                              length=400, height=10, width=400)
+        self.base = bone.Bone()
+        self.base_box = box.Box(
+            pos=(95 / 2, 25, 0),
+            length=95, height=75, width=75)
 
-        self.b0 = Bone(parent=self.base, pos=(0, 0, 0),
-                       freedom_x_angle=(atr(-65), atr(90)))
-        self.b0_celinder = cylinder(parent=self.b0, pos=(
-            0, 0, 0), axis=(-30, 0, 0), radius=20)
+        self.base_table = box.Box(
+            pos=(0, -218 - 5, 0),
+            length=400, height=10, width=400)
 
-        self.b1 = Bone(parent=self.b0, pos=(0, 0, 0),
-                       freedom_z_angle=(atr(-135), 0))
-        self.b1_celinder = cylinder(parent=self.b1, pos=(
-            0, 0, -75 / 2), axis=(0, 0, 75), radius=20)
-        self.b1_box = box(parent=self.b1, pos=(0, -100 / 2, 0),
-                          length=40, height=100, width=75)
+        self.b0 = bone.Bone(
+            parent=self.base, pos=(0, 0, 0),
+            freedom_x_angle=(atr(-65), atr(90)))
+        self.b0_celinder = cylinder.Cylinder(
+            parent=self.b0,
+            pos=(0, 0, 0), axis=(-30, 0, 0), radius=20)
 
-        self.b2 = Bone(parent=self.b1, pos=(0, 0, 0),
-                       freedom_y_angle=(atr(-180), 0))
-        self.b2_box = box(parent=self.b2, pos=(0, -135, 0),
-                          length=25, height=70, width=65)
-        self.b2_celinder_2 = cylinder(parent=self.b2, pos=(
+        self.b1 = bone.Bone(
+            parent=self.b0, pos=(0, 0, 0),
+            freedom_z_angle=(atr(-135), 0))
+        self.b1_celinder = cylinder.Cylinder(
+            parent=self.b1,
+            pos=(0, 0, -75 / 2), axis=(0, 0, 75), radius=20)
+        self.b1_box = box.Box(
+            parent=self.b1, pos=(0, -100 / 2, 0),
+            length=40, height=100, width=75)
+
+        self.b2 = bone.Bone(
+            parent=self.b1, pos=(0, 0, 0),
+            freedom_y_angle=(atr(-180), 0))
+
+        self.b2_box = box.Box(
+            parent=self.b2, pos=(0, -135, 0),
+            length=25, height=70, width=65)
+
+        self.b2_celinder_2 = cylinder.Cylinder(parent=self.b2, pos=(
             0, -165, -70 / 2), axis=(0, 0, 70), radius=5)
 
-        self.b3 = Bone(parent=self.b2, pos=(0, -165, 0),
-                       freedom_z_angle=(0, atr(110)))
-        self.b3_box = box(parent=self.b3, pos=(0, -85 / 2, 0),
-                          length=30, height=90, width=45)
+        self.b3 = bone.Bone(
+            parent=self.b2, pos=(0, -165, 0),
+            freedom_z_angle=(0, atr(110)))
 
-        self.b4 = Bone(parent=self.b3, pos=(0, -85, 0),
-                       freedom_y_angle=(atr(-80), atr(90)))
-        self.b4_box = box(parent=self.b4, pos=(0, -50 / 2, 0),
-                          length=25, height=50, width=50)
+        self.b3_box = box.Box(
+            parent=self.b3, pos=(0, -85 / 2, 0),
+            length=30, height=90, width=45)
 
-        self.b4_sponge_l = box(parent=self.b4, pos=(
+        self.b4 = bone.Bone(
+            parent=self.b3, pos=(0, -85, 0),
+            freedom_y_angle=(atr(-80), atr(90)))
+
+        self.b4_box = box.Box(
+            parent=self.b4, pos=(0, -50 / 2, 0),
+            length=25, height=50, width=50)
+
+        self.b4_sponge_l = box.Box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), 6 / 2), length=7, height=55, width=6)
-        self.b4_sponge_r = box(parent=self.b4, pos=(
+        self.b4_sponge_r = box.Box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), -6 / 2), length=7, height=55, width=6)
         self.open_sponges()
 
-        self.b5 = Bone(parent=self.b4, pos=(0, -105, 0))
+        self.b5 = bone.Bone(parent=self.b4, pos=(0, -105, 0))
         self.end = self.b5
         self.last_time = time.time()
 
-        # self.b2.add_target(vector(-100, -10, -50), vector(0, 0, 0), 0.01)
+        # self.b2.add_target(vector.Vector(-100, -10, -50), vector.Vector(0, 0, 0), 0.01)
 
         # мап фукнций
         self.fun_map = {
@@ -139,8 +161,8 @@ class Hand:
         offset = self.max_sponge_move * (
             (angle - self.sponge_angle_range[0]) /
             (self.sponge_angle_range[1] - self.sponge_angle_range[0]))
-        self.b4_sponge_l.pos = vector(0, -(50 + 55 / 2), 6 / 2 + offset)
-        self.b4_sponge_r.pos = vector(0, -(50 + 55 / 2), -6 / 2 - offset)
+        self.b4_sponge_l.pos = vector.Vector(0, -(50 + 55 / 2), 6 / 2 + offset)
+        self.b4_sponge_r.pos = vector.Vector(0, -(50 + 55 / 2), -6 / 2 - offset)
 
     def get_sponge_value(self):
         return self.sponge_angle
@@ -167,7 +189,7 @@ class Hand:
         '''Установить конец манипулятора в заданную точку'''
         for i in range(count):
             pos = self.end.calk_ik_pos_2(
-                ((target, vector(0.0, 0.0, 0.0), 1.0), ))
+                ((target, vector.Vector(0.0, 0.0, 0.0), 1.0), ))
 
         # с ориентируем клешню параллельно полу.
         self.b4.rotate_by_normal_y()
@@ -229,7 +251,7 @@ class Hand:
 
     def get_target_pos(self):
         '''Получить точку конца манипулятора'''
-        return self.end.frame_to_world(vector(0, 0, 0))
+        return self.end.frame_to_world(vector.Vector(0, 0, 0))
 
 
 if __name__ == '__main__':

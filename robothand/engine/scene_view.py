@@ -4,8 +4,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from PyQt4.QtCore import pyqtSignal
-from sphere import sphere
-from scene import Scene
+import sphere
+import scene
 
 
 class SceneView(QtOpenGL.QGLWidget):
@@ -22,7 +22,7 @@ class SceneView(QtOpenGL.QGLWidget):
         self.rotate_camera = False
         self.move_cursor = False
         self.old_cursore_pos = None
-        self.sphere = sphere(radius=10)
+        self.sphere = sphere.Sphere(radius=10)
 
     def sizeHint(self):
         return QtCore.QSize(1024, 768)
@@ -32,7 +32,7 @@ class SceneView(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         glutInit(sys.argv)
-        self.scene = Scene.GetCurScene()
+        self.scene = scene.Scene.GetCurScene()
         self.scene.initializeGL()
 
     def paintGL(self):

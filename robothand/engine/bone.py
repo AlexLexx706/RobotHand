@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import division
-from my_frame import MyFrame
-from vector import *
-from cylinder import cylinder as arrow
+import my_frame
+import vector
+import cylinder
 
 
-class Bone(MyFrame):
+class Bone(my_frame.MyFrame):
     def __init__(
             self, show_center=True,
             freedom_x_angle=None, freedom_y_angle=None, freedom_z_angle=None,
@@ -25,7 +25,7 @@ class Bone(MyFrame):
                 freedom_z_move - ограничения перемещения,
                 none или (start_pos, end_pos)
         """
-        MyFrame.__init__(self, **kwargs)
+        my_frame.MyFrame.__init__(self, **kwargs)
         self.targets = []
         self.freedom_x_angle = freedom_x_angle
         self.freedom_y_angle = freedom_y_angle
@@ -35,13 +35,13 @@ class Bone(MyFrame):
         self.freedom_y_move = freedom_y_move
         self.freedom_z_move = freedom_z_move
 
-        self.x_arrow = arrow(
+        self.x_arrow = cylinder.Cylinder(
             parent=self, pos=(0, 0, 0), axis=(1, 0, 0),
             length=10, shaftwidth=1, fixedwidth=True, color=(1, 0, 0))
-        self.y_arrow = arrow(
+        self.y_arrow = cylinder.Cylinder(
             parent=self, pos=(0, 0, 0), axis=(0, 1, 0),
             length=10, shaftwidth=1, fixedwidth=True, color=(0, 1, 0))
-        self.z_arrow = arrow(
+        self.z_arrow = cylinder.Cylinder(
             parent=self, pos=(0, 0, 0), axis=(0, 0, 1),
             length=10, shaftwidth=1, fixedwidth=True, color=(0, 0, 1))
         self.set_visible_center(show_center)
@@ -103,27 +103,40 @@ class Bone(MyFrame):
         self.rotate(angle=offset_angle, axis=axis.cross(up))
 
     def get_angle_x(self):
-        return self.get_proj_angle(vector(0, 1, 0), vector(0, 0, 1), self.up)
+        return self.get_proj_angle(
+            vector.Vector(0, 1, 0), vector.Vector(0, 0, 1), self.up)
 
     def set_angle_x(self, angle):
-        self.set_proj_angle(self.freedom_x_angle, angle,
-                            vector(0, 1, 0), vector(0, 0, 1), self.up)
+        self.set_proj_angle(
+            self.freedom_x_angle,
+            angle,
+            vector.Vector(0, 1, 0),
+            vector.Vector(0, 0, 1),
+            self.up)
 
     def get_angle_y(self):
         return self. get_proj_angle(
-            vector(0, 0, 1), vector(1, 0, 0), self.axis.cross(self.up))
+            vector.Vector(0, 0, 1),
+            vector.Vector(1, 0, 0),
+            self.axis.cross(self.up))
 
     def set_angle_y(self, angle):
-        self.set_proj_angle(self.freedom_y_angle, angle, vector(
-            0, 0, 1), vector(1, 0, 0), self.axis.cross(self.up))
+        self.set_proj_angle(
+            self.freedom_y_angle,
+            angle,
+            vector.Vector(0, 0, 1),
+            vector.Vector(1, 0, 0),
+            self.axis.cross(self.up))
 
     def get_angle_z(self):
         return self. get_proj_angle(
-            vector(1, 0, 0), vector(0, 1, 0), self.axis)
+            vector.Vector(1, 0, 0),
+            vector.Vector(0, 1, 0),
+            self.axis)
 
     def set_angle_z(self, angle):
-        self.set_proj_angle(self.freedom_z_angle, angle, vector(
-            1, 0, 0), vector(0, 1, 0), self.axis)
+        self.set_proj_angle(self.freedom_z_angle, angle, vector.Vector(
+            1, 0, 0), vector.Vector(0, 1, 0), self.axis)
 
     def calk_ik_on_plane(self, plane, base_axis, freedom, target, end):
         '''Рассчёт кинематики для оси'''
@@ -228,7 +241,7 @@ class Bone(MyFrame):
         # вращение по z
         if self.freedom_z_angle is not None:
             self.calk_ik_on_plane_2(
-                (vector(1, 0, 0), vector(0, 1, 0)),
+                (vector.Vector(1, 0, 0), vector.Vector(0, 1, 0)),
                 self.axis,
                 self.freedom_z_angle,
                 cur_targets)
@@ -236,7 +249,7 @@ class Bone(MyFrame):
         # вращение по y
         if self.freedom_y_angle is not None:
             self.calk_ik_on_plane_2(
-                (vector(0, 0, 1), vector(1, 0, 0)),
+                (vector.Vector(0, 0, 1), vector.Vector(1, 0, 0)),
                 self.axis.cross(self.up),
                 self.freedom_y_angle,
                 cur_targets)
@@ -244,13 +257,14 @@ class Bone(MyFrame):
         # вращение по x
         if self.freedom_x_angle is not None:
             self.calk_ik_on_plane_2(
-                (vector(0, 1, 0), vector(0, 0, 1)),
+                (vector.Vector(0, 1, 0), vector.Vector(0, 0, 1)),
                 self.up,
                 self.freedom_x_angle,
                 cur_targets)
 
         # рассчитаем кинематику для родителя
-        if self.parent is not None and isinstance(self.parent, MyFrame):
+        if self.parent is not None and isinstance(
+                self.parent, my_frame.MyFrame):
             data = [
                 (g, self.parent.world_to_frame(
                     self.frame_to_world(t[1])), t[2])
@@ -259,7 +273,7 @@ class Bone(MyFrame):
 
         return self.frame_to_world(end)
 
-    def calk_ik_pos(self, glob_target, end=vector(0, 0, 0)):
+    def calk_ik_pos(self, glob_target, end=vector.Vector(0, 0, 0)):
         '''Рассчёт инверсной кинематики'''
         # print "calk_ik_pos(calk_ik_pos:{})".format(glob_target)
 
@@ -268,13 +282,13 @@ class Bone(MyFrame):
 
         # вращение по z
         if self.freedom_z_angle is not None:
-            self.calk_ik_on_plane((vector(1, 0, 0), vector(
+            self.calk_ik_on_plane((vector.Vector(1, 0, 0), vector.Vector(
                 0, 1, 0)), self.axis, self.freedom_z_angle, target, end)
 
         # вращение по y
         if self.freedom_y_angle is not None:
             self.calk_ik_on_plane(
-                (vector(0, 0, 1), vector(1, 0, 0)),
+                (vector.Vector(0, 0, 1), vector.Vector(1, 0, 0)),
                 self.axis.cross(self.up),
                 self.freedom_y_angle,
                 target,
@@ -282,11 +296,12 @@ class Bone(MyFrame):
 
         # вращение по x
         if self.freedom_x_angle is not None:
-            self.calk_ik_on_plane((vector(0, 1, 0), vector(
+            self.calk_ik_on_plane((vector.Vector(0, 1, 0), vector.Vector(
                 0, 0, 1)), self.up, self.freedom_x_angle, target, end)
 
         # рассчитаем инематику для родителя
-        if self.parent is not None and isinstance(self.parent, MyFrame):
+        if self.parent is not None and isinstance(
+                self.parent, my_frame.MyFrame):
             self.parent.calk_ik_pos(
                 glob_target,
                 self.parent.world_to_frame(self.frame_to_world(end)))
@@ -296,10 +311,11 @@ class Bone(MyFrame):
     def rotate_by_normal(self, plane, base_axis, freedom, global_normal):
         '''Сориентировать звено по проекции плоскости'''
         # 1. преобразуем global_normal нормаль в локальную
-        if self.parent is not None and isinstance(self.parent, MyFrame):
+        if self.parent is not None and isinstance(
+                self.parent, my_frame.MyFrame):
             normal = self.parent.world_to_frame(
-                vector(0, 0, 0) + global_normal) -\
-                self.parent.world_to_frame(vector(0, 0, 0))
+                vector.Vector(0, 0, 0) + global_normal) -\
+                self.parent.world_to_frame(vector.Vector(0, 0, 0))
         else:
             normal = global_normal
 
@@ -311,9 +327,9 @@ class Bone(MyFrame):
             angle = self.get_proj_angle(plane[0], plane[1], horizont)
             self.set_proj_angle(freedom, angle, plane[0], plane[1], base_axis)
 
-    def rotate_by_normal_y(self, global_normal=vector(0, 1, 0)):
+    def rotate_by_normal_y(self, global_normal=vector.Vector(0, 1, 0)):
         self.rotate_by_normal(
-            (vector(0, 0, 1), vector(1, 0, 0)),
+            (vector.Vector(0, 0, 1), vector.Vector(1, 0, 0)),
             self.axis.cross(self.up),
             self.freedom_y_angle,
             global_normal)

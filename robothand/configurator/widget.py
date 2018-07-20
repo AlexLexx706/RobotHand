@@ -46,7 +46,7 @@ class Configurator(QtGui.QMainWindow):
                 index, limmit[0][0], limmit[1][0])
 
         self.scene_view.hand.set_save_state()
-        self.scene_view.sphere.pos = vector(0, -130, 130)
+        self.scene_view.sphere.pos = vector.Vector(0, -130, 130)
 
     def closeEvent(self, event):
         self.scene_view.timer.stop()
@@ -116,16 +116,16 @@ class Configurator(QtGui.QMainWindow):
 
     def on_cursor_move(self, camera, cur_pos, state):
         if state == 0:
-            self.plain_pos = vector(self.scene_view.sphere.pos)
+            self.plain_pos = vector.Vector(self.scene_view.sphere.pos)
         # плоскость x
         if self.radioButton_plain_x.isChecked():
-            plain = (vector(1, 0, 0), self.plain_pos)
+            plain = (vector.Vector(1, 0, 0), self.plain_pos)
             pos = camera.get_point_on_plain(cur_pos, plain)
         elif self.radioButton_plain_y.isChecked():
-            plain = (vector(0, 1, 0), self.plain_pos)
+            plain = (vector.Vector(0, 1, 0), self.plain_pos)
             pos = camera.get_point_on_plain(cur_pos, plain)
         elif self.radioButton_plain_z.isChecked():
-            plain = (vector(0, 0, 1), self.plain_pos)
+            plain = (vector.Vector(0, 0, 1), self.plain_pos)
             pos = camera.get_point_on_plain(cur_pos, plain)
         else:
             plain = (camera.get_plain()[0], self.plain_pos)
@@ -154,7 +154,7 @@ class Configurator(QtGui.QMainWindow):
     @pyqtSlot(bool)
     def on_pushButton_reset_hand_clicked(self, v):
         if not self.save_state_thread:
-            self.scene_view.sphere.pos = vector(0, -130, 130)
+            self.scene_view.sphere.pos = vector.Vector(0, -130, 130)
             self.save_state_thread = threading.Thread(
                 target=self.save_state_thread_proc)
             self.save_state_thread.start()

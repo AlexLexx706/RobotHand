@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from OpenGL.GL import *
-from my_frame import MyFrame
+import my_frame
 
 
-class base_shape(MyFrame):
+class BaseShape(my_frame.MyFrame):
     def __init__(self, **kwargs):
         """
             radius = 1, length = 1 segments = 10,
             color=(1, 1, 1), pos=(0, 0, 0), axis=(1, 0, 0), up=(0, 1, 0)
         """
-        MyFrame.__init__(self, **kwargs)
+        my_frame.MyFrame.__init__(self, **kwargs)
         self.color = kwargs["color"] if "color" in kwargs else (1.0, 1.0, 1.0)
         self.list_id = None
         self.visible = True
@@ -21,7 +21,7 @@ class base_shape(MyFrame):
     def remove(self):
         if self.list_id is not None:
             glDeleteLists(self.list_id, 1)
-        MyFrame.remove(self)
+        my_frame.MyFrame.remove(self)
 
     def update(self):
         # построение
@@ -32,10 +32,10 @@ class base_shape(MyFrame):
             self.first_make = False
 
         if self.visible:
-            glLoadMatrixd(self.get_matrix().T)
+            glLoadMatrixd(self.matrix.T)
             glColor(self.color)
             glCallList(self.list_id)
 
 
 if __name__ == '__main__':
-    base_shape()
+    BaseShape()
