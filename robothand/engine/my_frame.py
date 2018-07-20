@@ -16,13 +16,13 @@ class MyFrame:
         """
             Создание фрейма.
             Параметры:
-            frame - родитель
+            parent - родитель
             pos - позиция в локальных координатах
             x, y, z - то же что и pos
             axis - орт x
             up  - орт y
         """
-        self.frame = kwargs["frame"] if "frame" in kwargs else None
+        self.parent = kwargs["parent"] if "parent" in kwargs else None
 
         # Определение осей
         if "axis" in kwargs:
@@ -65,8 +65,8 @@ class MyFrame:
         self.scene.frames.append(self)
         self.childs = []
 
-        if self.frame is not None:
-            self.frame.childs.append(self)
+        if self.parent is not None:
+            self.parent.childs.append(self)
 
     def __getattr__(self, name):
         if name == "axis":
@@ -87,10 +87,10 @@ class MyFrame:
         self.scene.frames.remove(self)
 
         for ch in self.childs:
-            ch.frame = None
+            ch.parent = None
 
-        if self.frame is not None:
-            self.frame.childs.remove(self)
+        if self.parent is not None:
+            self.parent.childs.remove(self)
         self.childs = []
 
     def __del__(self):
@@ -98,10 +98,10 @@ class MyFrame:
 
     def get_matrix(self):
         u'''Возвращает матрицу фрейма'''
-        if self.frame is None:
+        if self.parent is None:
             return self.matrix
 
-        return self.frame.get_matrix().dot(self.matrix)
+        return self.parent.get_matrix().dot(self.matrix)
 
     def frame_to_world(self, frame_pos):
         u'''Преобразует локальные координаты frame_pos в глобальные'''

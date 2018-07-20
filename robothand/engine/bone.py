@@ -15,7 +15,7 @@ class Bone(MyFrame):
         """
             Обьект кость,
                 с помощью кости можно решать задачу инверсной кинематики
-            frame - предок
+            parent - предок
             pos - позиция локальные координаты
             len - длинна видимого обьекта кости
             freedom_x_angle, freedom_y_angle,
@@ -36,13 +36,13 @@ class Bone(MyFrame):
         self.freedom_z_move = freedom_z_move
 
         self.x_arrow = arrow(
-            frame=self, pos=(0, 0, 0), axis=(1, 0, 0),
+            parent=self, pos=(0, 0, 0), axis=(1, 0, 0),
             length=10, shaftwidth=1, fixedwidth=True, color=(1, 0, 0))
         self.y_arrow = arrow(
-            frame=self, pos=(0, 0, 0), axis=(0, 1, 0),
+            parent=self, pos=(0, 0, 0), axis=(0, 1, 0),
             length=10, shaftwidth=1, fixedwidth=True, color=(0, 1, 0))
         self.z_arrow = arrow(
-            frame=self, pos=(0, 0, 0), axis=(0, 0, 1),
+            parent=self, pos=(0, 0, 0), axis=(0, 0, 1),
             length=10, shaftwidth=1, fixedwidth=True, color=(0, 0, 1))
         self.set_visible_center(show_center)
 
@@ -243,11 +243,11 @@ class Bone(MyFrame):
                 0, 0, 1)), self.up, self.freedom_x_angle, cur_targets)
 
         # рассчитаем кинематику для родителя
-        if self.frame is not None and isinstance(self.frame, MyFrame):
+        if self.parent is not None and isinstance(self.parent, MyFrame):
             data = [
-                (g, self.frame.world_to_frame(self.frame_to_world(t[1])), t[2])
+                (g, self.parent.world_to_frame(self.frame_to_world(t[1])), t[2])
                 for g, t in zip(glob_targets, cur_targets)]
-            self.frame.calk_ik_pos_2(data)
+            self.parent.calk_ik_pos_2(data)
 
         return self.frame_to_world(end)
 
@@ -278,20 +278,20 @@ class Bone(MyFrame):
                 0, 0, 1)), self.up, self.freedom_x_angle, target, end)
 
         # рассчитаем инематику для родителя
-        if self.frame is not None and isinstance(self.frame, MyFrame):
-            self.frame.calk_ik_pos(
+        if self.parent is not None and isinstance(self.parent, MyFrame):
+            self.parent.calk_ik_pos(
                 glob_target,
-                self.frame.world_to_frame(self.frame_to_world(end)))
+                self.parent.world_to_frame(self.frame_to_world(end)))
 
         return self.frame_to_world(end)
 
     def rotate_by_normal(self, plane, base_axis, freedom, global_normal):
         '''Сориентировать звено по проекции плоскости'''
         # 1. преобразуем global_normal нормаль в локальную
-        if self.frame is not None and isinstance(self.frame, MyFrame):
-            normal = self.frame.world_to_frame(
+        if self.parent is not None and isinstance(self.parent, MyFrame):
+            normal = self.parent.world_to_frame(
                 vector(0, 0, 0) + global_normal) -\
-                self.frame.world_to_frame(vector(0, 0, 0))
+                self.parent.world_to_frame(vector(0, 0, 0))
         else:
             normal = global_normal
 
@@ -331,9 +331,9 @@ if __name__ == '__main__':
 
     # создадим руку
     b1 = Bone(freedom_z_angle=(0, 2))
-    b2 = Bone(frame=b1, pos=(20, 0, 0), freedom_z_angle=(0, 2))
-    b3 = Bone(frame=b2, pos=(20, 0, 0), freedom_z_angle=(0, 2))
-    b4 = Bone(frame=b3, pos=(20, 0, 0), freedom_z_angle=(0, 2))
+    b2 = Bone(parent=b1, pos=(20, 0, 0), freedom_z_angle=(0, 2))
+    b3 = Bone(parent=b2, pos=(20, 0, 0), freedom_z_angle=(0, 2))
+    b4 = Bone(parent=b3, pos=(20, 0, 0), freedom_z_angle=(0, 2))
     sp = sphere()
 
     # обработчик

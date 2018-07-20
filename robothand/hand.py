@@ -35,42 +35,42 @@ class Hand:
         self.base_table = box(pos=(0, -218 - 5, 0),
                               length=400, height=10, width=400)
 
-        self.b0 = Bone(frame=self.base, pos=(0, 0, 0),
+        self.b0 = Bone(parent=self.base, pos=(0, 0, 0),
                        freedom_x_angle=(atr(-65), atr(90)))
-        self.b0_celinder = cylinder(frame=self.b0, pos=(
+        self.b0_celinder = cylinder(parent=self.b0, pos=(
             0, 0, 0), axis=(-30, 0, 0), radius=20)
 
-        self.b1 = Bone(frame=self.b0, pos=(0, 0, 0),
+        self.b1 = Bone(parent=self.b0, pos=(0, 0, 0),
                        freedom_z_angle=(atr(-135), 0))
-        self.b1_celinder = cylinder(frame=self.b1, pos=(
+        self.b1_celinder = cylinder(parent=self.b1, pos=(
             0, 0, -75 / 2), axis=(0, 0, 75), radius=20)
-        self.b1_box = box(frame=self.b1, pos=(0, -100 / 2, 0),
+        self.b1_box = box(parent=self.b1, pos=(0, -100 / 2, 0),
                           length=40, height=100, width=75)
 
-        self.b2 = Bone(frame=self.b1, pos=(0, 0, 0),
+        self.b2 = Bone(parent=self.b1, pos=(0, 0, 0),
                        freedom_y_angle=(atr(-180), 0))
-        self.b2_box = box(frame=self.b2, pos=(0, -135, 0),
+        self.b2_box = box(parent=self.b2, pos=(0, -135, 0),
                           length=25, height=70, width=65)
-        self.b2_celinder_2 = cylinder(frame=self.b2, pos=(
+        self.b2_celinder_2 = cylinder(parent=self.b2, pos=(
             0, -165, -70 / 2), axis=(0, 0, 70), radius=5)
 
-        self.b3 = Bone(frame=self.b2, pos=(0, -165, 0),
+        self.b3 = Bone(parent=self.b2, pos=(0, -165, 0),
                        freedom_z_angle=(0, atr(110)))
-        self.b3_box = box(frame=self.b3, pos=(0, -85 / 2, 0),
+        self.b3_box = box(parent=self.b3, pos=(0, -85 / 2, 0),
                           length=30, height=90, width=45)
 
-        self.b4 = Bone(frame=self.b3, pos=(0, -85, 0),
+        self.b4 = Bone(parent=self.b3, pos=(0, -85, 0),
                        freedom_y_angle=(atr(-80), atr(90)))
-        self.b4_box = box(frame=self.b4, pos=(0, -50 / 2, 0),
+        self.b4_box = box(parent=self.b4, pos=(0, -50 / 2, 0),
                           length=25, height=50, width=50)
 
-        self.b4_sponge_l = box(frame=self.b4, pos=(
+        self.b4_sponge_l = box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), 6 / 2), length=7, height=55, width=6)
-        self.b4_sponge_r = box(frame=self.b4, pos=(
+        self.b4_sponge_r = box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), -6 / 2), length=7, height=55, width=6)
         self.open_sponges()
 
-        self.b5 = Bone(frame=self.b4, pos=(0, -105, 0))
+        self.b5 = Bone(parent=self.b4, pos=(0, -105, 0))
         self.end = self.b5
         self.last_time = time.time()
 

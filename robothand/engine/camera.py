@@ -9,8 +9,8 @@ from vector import *
 class camera(MyFrame):
     def __init__(self, **kwargs):
         MyFrame.__init__(self, **kwargs)
-        self.koleno = MyFrame(frame=self)
-        self.eye = MyFrame(frame=self.koleno, pos=vector(0, 0, 2000))
+        self.koleno = MyFrame(parent=self)
+        self.eye = MyFrame(parent=self.koleno, pos=vector(0, 0, 2000))
 
     def update_camera(self):
         glMatrixMode(GL_PROJECTION)
