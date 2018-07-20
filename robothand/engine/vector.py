@@ -108,26 +108,41 @@ class vector(np.ndarray):
 
 
 if __name__ == "__main__":
-    print type(mag(vector(2, 0, 0)))
-    print type(mag2(vector(2, 0, 0)))
-    print type(norm(vector(2, 0, 0)))
-    print type(dot(vector(1, 0, 0), vector(0.3, 1, 0)))
-    print type(cross(vector(1, 0, 0), vector(0.3, 1, 0)))
-    print type(proj(vector(1, 0, 0), vector(0.3, 1, 0)))
-    print type(comp(vector(1, 0, 0), vector(0.3, 1, 0)))
-    print type(diff_angle(vector(1, 0, 0), vector(-1, 1, 0)))
-    print type(rotate(vector(1, 0, 0), 1, vector(0, 1, 0)))
-    print type(astuple(vector(1, 0, 0)))
-
     from visual_common.cvisual import vector as v_vector
-    print vector(2, 0, 0).mag, v_vector(2, 0, 0).mag
-    print vector(2, 0, 0).mag2, v_vector(2, 0, 0).mag2
-    print vector(2, 0, 0).norm(), v_vector(2, 0, 0).norm()
-    print vector(1, 0, 0).dot(vector(0.3, 1, 0)),v_vector(1, 0, 0).dot(vector(0.3, 1, 0))
 
-    print vector(1, 0, 0).cross(vector(0.3, 1, 0)), v_vector(1, 0, 0).cross(vector(0.3, 1, 0))
-    print vector(1, 0, 0).proj(vector(0.3, 1, 0)), v_vector(1, 0, 0).proj(vector(0.3, 1, 0))
-    print vector(1, 0, 0).comp(vector(0.3, 1, 0)), v_vector(1, 0, 0).comp(v_vector(0.3, 1, 0))
-    print vector(1, 0, 0).diff_angle(vector(-1, 1, 0)), v_vector(1, 0, 0).diff_angle(vector(-1, 1, 0))
-    print vector(1, 0, 0).rotate(1, vector(0, 1, 0)), v_vector(1, 0, 0).rotate(1, v_vector(0, 1, 0))
-    print vector(1, 0, 0).astuple(), v_vector(1, 0, 0).astuple()
+    print(type(mag(vector(2, 0, 0))))
+    print(type(mag2(vector(2, 0, 0))))
+    print(type(norm(vector(2, 0, 0))))
+    print(type(dot(vector(1, 0, 0), vector(0.3, 1, 0))))
+    print(type(cross(vector(1, 0, 0), vector(0.3, 1, 0))))
+    print(type(proj(vector(1, 0, 0), vector(0.3, 1, 0))))
+    print(type(comp(vector(1, 0, 0), vector(0.3, 1, 0))))
+    print(type(diff_angle(vector(1, 0, 0), vector(-1, 1, 0))))
+    print(type(rotate(vector(1, 0, 0), 1, vector(0, 1, 0))))
+    print(type(astuple(vector(1, 0, 0))))
+
+    print (vector(2, 0, 0).mag, v_vector(2, 0, 0).mag)
+    print (vector(2, 0, 0).mag2, v_vector(2, 0, 0).mag2)
+    print (vector(2, 0, 0).norm(), v_vector(2, 0, 0).norm())
+    print(
+        vector(1, 0, 0).dot(vector(0.3, 1, 0)),
+        v_vector(1, 0, 0).dot(vector(0.3, 1, 0)))
+
+    print(
+        vector(1, 0, 0).cross(vector(0.3, 1, 0)),
+        v_vector(1, 0, 0).cross(vector(0.3, 1, 0)))
+    print(
+        vector(1, 0, 0).proj(vector(0.3, 1, 0)),
+        v_vector(1, 0, 0).proj(vector(0.3, 1, 0)))
+    print(
+        vector(1, 0, 0).comp(vector(0.3, 1, 0)),
+        v_vector(1, 0, 0).comp(v_vector(0.3, 1, 0)))
+    print(
+        vector(1, 0, 0).diff_angle(vector(-1, 1, 0)),
+        v_vector(1, 0, 0).diff_angle(vector(-1, 1, 0)))
+    print(
+        vector(1, 0, 0).rotate(1, vector(0, 1, 0)),
+        v_vector(1, 0, 0).rotate(1, v_vector(0, 1, 0)))
+    print(
+        vector(1, 0, 0).astuple(),
+        v_vector(1, 0, 0).astuple())

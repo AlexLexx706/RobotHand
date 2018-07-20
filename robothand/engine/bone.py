@@ -177,6 +177,7 @@ class Bone(MyFrame):
         # меньше минимума
         if dest_angle < freedom[0]:
             offset_angle = freedom[0] - cur_angle
+
         # больше максимума
         elif dest_angle > freedom[1]:
             offset_angle = freedom[1] - cur_angle
@@ -186,7 +187,7 @@ class Bone(MyFrame):
             self.rotate(angle=offset_angle, axis=rotate_axis)
 
     def calk_ik_offset_angle(self, plane, base_axis, freedom, target, end):
-        '''Рассчёт рассчёт угла смещения для IK'''
+        '''Рассчёт угла смещения для IK'''
         if end.mag == 0:
             return 0.0
 
@@ -226,8 +227,11 @@ class Bone(MyFrame):
 
         # вращение по z
         if self.freedom_z_angle is not None:
-            self.calk_ik_on_plane_2((vector(1, 0, 0), vector(
-                0, 1, 0)), self.axis, self.freedom_z_angle, cur_targets)
+            self.calk_ik_on_plane_2(
+                (vector(1, 0, 0), vector(0, 1, 0)),
+                self.axis,
+                self.freedom_z_angle,
+                cur_targets)
 
         # вращение по y
         if self.freedom_y_angle is not None:
@@ -239,13 +243,17 @@ class Bone(MyFrame):
 
         # вращение по x
         if self.freedom_x_angle is not None:
-            self.calk_ik_on_plane_2((vector(0, 1, 0), vector(
-                0, 0, 1)), self.up, self.freedom_x_angle, cur_targets)
+            self.calk_ik_on_plane_2(
+                (vector(0, 1, 0), vector(0, 0, 1)),
+                self.up,
+                self.freedom_x_angle,
+                cur_targets)
 
         # рассчитаем кинематику для родителя
         if self.parent is not None and isinstance(self.parent, MyFrame):
             data = [
-                (g, self.parent.world_to_frame(self.frame_to_world(t[1])), t[2])
+                (g, self.parent.world_to_frame(
+                    self.frame_to_world(t[1])), t[2])
                 for g, t in zip(glob_targets, cur_targets)]
             self.parent.calk_ik_pos_2(data)
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-from matplotlib.rcsetup import validate_nseq_float
 import numpy as np
 from scene import Scene
 import transformations
@@ -12,13 +11,17 @@ LOG = logging.getLogger(__name__)
 class MyFrame:
     '''Класс фрейм с корректными методами frame_to_world и world_to_frame'''
 
-    def __init__(self, **kwargs):
+    def __init__(
+            self,
+            parent=None,
+            pos=vector(0., 0., 0.),
+            axis=vector(1.0, 0.0, 0.0),
+            up=None):
         """
             Создание фрейма.
             Параметры:
             parent - родитель
             pos - позиция в локальных координатах
-            x, y, z - то же что и pos
             axis - орт x
             up  - орт y
         """
