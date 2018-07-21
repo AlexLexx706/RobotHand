@@ -25,6 +25,7 @@ class Sphere(base_shape.BaseShape):
             self.create_box()
 
     def create_box(self):
+        print('Sphere.create_box radius: self.radius:%s' % (self.radius, ))
         glNewList(self.list_id, GL_COMPILE)
         glBegin(GL_QUADS)
         glNormal3f(0.0, 1.0, 0.0)

@@ -54,28 +54,37 @@ class MyFrame:
     @property
     def axis(self):
         '''орт оси x'''
-        return self._matrix[:3, 0].view(vector.Vector)
+        res = self._matrix[:3, 0].view(vector.Vector)
+        print("axis:%s" % (res, ))
+        return res
 
     @property
     def up(self):
         '''орт оси y'''
-        return self._matrix[:3, 1].view(vector.Vector)
+        res = self._matrix[:3, 1].view(vector.Vector)
+        print("up:%s" % (res, ))
+        return res
 
     @property
     def pos(self):
         '''позиция в локальных координатах'''
-        return self._matrix[:3, 3].view(vector.Vector)
+        res = self._matrix[:3, 3].view(vector.Vector)
+        print("pos:%s" % (res, ))
+        return res
 
     @pos.setter
     def set_pos(self, pos):
         '''установит позицию в локальных координатах'''
+        print("set_pos pos:%s" % (pos, ))
         self._matrix[:3, 3] = pos
 
     @property
     def matrix(self):
         '''Возвращает матрицу фрейма'''
-        return self._matrix if self.parent is None else\
+        res = self._matrix if self.parent is None else\
             self.parent.matrix.dot(self._matrix)
+        print("matrix:%s" % (res, ))
+        return res
 
     def remove(self):
         '''Удалить со сцены'''
