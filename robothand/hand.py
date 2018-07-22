@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import division
-from engine import box
-from engine import bone
-from engine import cylinder
-from engine import vector
-
 import time
 import math
 import logging
+
+from engine_3d import box
+from engine_3d import bone
+from engine_3d import cylinder
+from engine_3d import vector
 
 
 LOG = logging.getLogger(__name__)
@@ -20,7 +20,9 @@ def atr(angle):
 
 class Hand:
     '''Рука'''
-    save_state = ((1, 0), (2, 0), (3, atr(-90)), (4, atr(150)), (5, 0), (6, 85))
+    save_state = (
+        (1, 0), (2, 0), (3, atr(-90)),
+        (4, atr(150)), (5, 0), (6, 85))
 
     class WrongIndexError(Exception):
         '''Ошибка не верный индекс'''
@@ -162,7 +164,8 @@ class Hand:
             (angle - self.sponge_angle_range[0]) /
             (self.sponge_angle_range[1] - self.sponge_angle_range[0]))
         self.b4_sponge_l.pos = vector.Vector(0, -(50 + 55 / 2), 6 / 2 + offset)
-        self.b4_sponge_r.pos = vector.Vector(0, -(50 + 55 / 2), -6 / 2 - offset)
+        self.b4_sponge_r.pos = vector.Vector(
+            0, -(50 + 55 / 2), -6 / 2 - offset)
 
     def get_sponge_value(self):
         return self.sponge_angle

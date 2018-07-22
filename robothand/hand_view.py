@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-from engine.scene_view import SceneView
-from hand import Hand
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
+from PyQt4.QtCore import pyqtSignal
 import logging
+from engine_3d import scene_view
+from hand import Hand
+
 LOG = logging.getLogger()
 
 
-class HandView(SceneView):
+class HandView(scene_view.SceneView):
     # движение курсора
     angles_changed = pyqtSignal(object)
 
     def __init__(self, parent=None):
-        SceneView.__init__(self, parent)
+        scene_view.SceneView.__init__(self, parent)
         self.hand = Hand()
         self.hand.set_save_state()
 

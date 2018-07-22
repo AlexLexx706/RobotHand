@@ -8,7 +8,7 @@ import sys
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSlot
 from robothand.protocol.hand_protocol import HandProtocol
-from robothand.engine import vector
+from engine_3d import vector
 import time
 
 
