@@ -2,7 +2,7 @@
 from PyQt4.QtCore import pyqtSignal
 import logging
 from engine_3d import scene_view
-from hand import Hand
+from robothand import hand
 
 LOG = logging.getLogger()
 
@@ -13,7 +13,7 @@ class HandView(scene_view.SceneView):
 
     def __init__(self, parent=None):
         scene_view.SceneView.__init__(self, parent)
-        self.hand = Hand()
+        self.hand = hand.Hand()
         self.hand.set_save_state()
 
     def set_hand_pos(self, pos):

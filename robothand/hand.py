@@ -90,6 +90,8 @@ class Hand:
 
         self.b4_sponge_l = box.Box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), 6 / 2), length=7, height=55, width=6)
+
+        self.b4_sponge_l.pos = (10, 1, 1)
         self.b4_sponge_r = box.Box(parent=self.b4, pos=(
             0, -(50 + 55 / 2), -6 / 2), length=7, height=55, width=6)
         self.open_sponges()

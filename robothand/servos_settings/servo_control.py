@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
 import os
 import math
+from PyQt4 import QtCore, QtGui, uic
+from PyQt4.QtCore import pyqtSlot, pyqtSignal
 
 
 class ServoControl(QtGui.QGroupBox):

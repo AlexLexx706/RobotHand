@@ -226,7 +226,7 @@
   <customwidget>
    <class>ServosSettings</class>
    <extends>QGroupBox</extends>
-   <header>robothand.servos_settings.servos_settings</header>
+   <header>robothand.servos_settings</header>
    <container>1</container>
   </customwidget>
   <customwidget>

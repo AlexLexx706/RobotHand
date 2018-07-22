@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 import threading
-import Queue
+import sys
+if sys.version_info[0] < 3:
+    import Queue
+else:
+    import queue as Queue
 import logging
 import sys
 from PyQt4 import QtGui, uic
@@ -36,7 +40,7 @@ class Configurator(QtGui.QMainWindow):
             self.groupBox_settings.on_angles_changed)
 
         self.lineEdit_port_name.setText(
-            self.settings.value("port_name", '27').toString())
+            self.settings.value("port_name", '27'))
         self.controll_thread = None
         self.proto = None
 
