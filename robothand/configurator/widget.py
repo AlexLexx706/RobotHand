@@ -3,14 +3,10 @@
 import os
 import threading
 import sys
-if sys.version_info[0] < 3:
-    import Queue
-else:
-    import queue as Queue
+import queue as Queue
 import logging
-import sys
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSlot
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import pyqtSlot
 from robothand.protocol.hand_protocol import HandProtocol
 from engine_3d import vector
 import time
@@ -19,9 +15,9 @@ import time
 LOG = logging.getLogger(__name__)
 
 
-class Configurator(QtGui.QMainWindow):
+class Configurator(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        super(QtGui.QMainWindow, self).__init__(parent)
+        super(QtWidgets.QMainWindow, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(
             __file__)[0], "configurator.ui"), self)
         self.save_state_thread = None
@@ -189,9 +185,9 @@ def main():
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s %(message)s',
         level=logging.DEBUG)
-    logging.getLogger("PyQt4").setLevel(logging.INFO)
+    logging.getLogger("PyQt5").setLevel(logging.INFO)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = Configurator()
     app.installEventFilter(widget)
     widget.show()

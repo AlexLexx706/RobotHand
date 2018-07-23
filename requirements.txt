@@ -1,8 +1,1 @@
-3d-engine==0.1
--e git+git@github.com:AlexLexx706/engine_3d.git@928ad5c6aa5a699982f39023f809ce900013f7c8#egg=engine_3d
-numpy==1.14.5
-PyOpenGL==3.1.0
-PyOpenGL-accelerate==3.1.0
-PyQt4==4.11.4
-pyserial==3.4
-scipy==1.1.0
+PyQt5==5.10.1

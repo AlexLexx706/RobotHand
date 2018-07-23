@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSlot
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import pyqtSlot
 
 
-class CreateServoDialog(QtGui.QDialog):
+class CreateServoDialog(QtWidgets.QDialog):
     def __init__(self, exist_servo_list, parent=None):
-        super(QtGui.QDialog, self).__init__(parent)
+        super(QtWidgets.QDialog, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)
                                 [0], "create_servo_dialog.ui"), self)
         self.exist_servo_list = exist_servo_list
@@ -54,9 +54,9 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s%(message)s',
         level=logging.DEBUG)
-    logging.getLogger("PyQt4").setLevel(logging.INFO)
+    logging.getLogger("PyQt5").setLevel(logging.INFO)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = CreateServoDialog([1, 2, 3, 4, 8, 12])
     app.installEventFilter(widget)
     widget.show()

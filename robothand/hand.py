@@ -260,13 +260,13 @@ class Hand:
 
 
 if __name__ == '__main__':
-    from PyQt4 import QtGui
+    from PyQt5 import QtGui
     from engine.scene_view import SceneView
     import sys
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s %(message)s',
         level=logging.DEBUG)
-    logging.getLogger("PyQt4").setLevel(logging.INFO)
+    logging.getLogger("PyQt5").setLevel(logging.INFO)
 
     app = QtGui.QApplication(sys.argv)
     mainWin = SceneView()

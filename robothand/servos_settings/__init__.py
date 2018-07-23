@@ -5,15 +5,15 @@ import json
 import sys
 import logging
 import math
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
+from PyQt5 import QtCore, QtWidgets, uic
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from robothand.servos_settings import servo_control
 from robothand.servos_settings import create_servo_dialog
 
 logger = logging.getLogger(__name__)
 
 
-class ServosSettings(QtGui.QGroupBox):
+class ServosSettings(QtWidgets.QGroupBox):
     value_changed = pyqtSignal(int, int)
     angle_changed = pyqtSignal(int, float)
     angle_range_changed = pyqtSignal(int, float, float)
@@ -24,7 +24,7 @@ class ServosSettings(QtGui.QGroupBox):
     def __init__(
             self, parent=None,
             settings=QtCore.QSettings("AlexLexx", "robot_hand")):
-        super(QtGui.QGroupBox, self).__init__(parent)
+        super(QtWidgets.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)
                                 [0], "servos_settings.ui"), self)
         self.settings = settings
@@ -57,7 +57,7 @@ class ServosSettings(QtGui.QGroupBox):
     def on_action_add_servo_triggered(self, v):
         dialog = create_servo_dialog.CreateServoDialog(self.get_servo_ids())
 
-        if dialog.exec_() == QtGui.QDialog.Accepted:
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
             control_settings = {"min": [0.0, 500], "max": [
                 math.pi, 2500], "index": dialog.get_id(), "value": 500}
             self.add_control(control_settings)
@@ -93,7 +93,7 @@ class ServosSettings(QtGui.QGroupBox):
 
     @pyqtSlot('bool')
     def on_pushButton_save_settings_clicked(self, v):
-        file_name = QtGui.QFileDialog.getSaveFileName(
+        file_name = QtWidgets.QFileDialog.getSaveFileName(
             self, u"Сохраним файл",
             self.settings.value("last_file").toString(), "Settings (*.json)")
 
@@ -105,7 +105,7 @@ class ServosSettings(QtGui.QGroupBox):
 
     @pyqtSlot('bool')
     def on_pushButton_open_settings_clicked(self, v):
-        file_name = QtGui.QFileDialog.getOpenFileName(
+        file_name = QtWidgets.QFileDialog.getOpenFileName(
             self, u"Открыть настройки",
             self.settings.value("last_file").toString(), "Settings (*.json)")
         self.open_settings(file_name)
@@ -130,9 +130,9 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s%(message)s',
         level=logging.DEBUG)
-    logging.getLogger("PyQt4").setLevel(logging.INFO)
+    logging.getLogger("PyQt5").setLevel(logging.INFO)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = ServosSettings()
     app.installEventFilter(widget)
     widget.show()

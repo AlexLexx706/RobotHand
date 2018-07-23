@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 import logging
 from engine_3d import scene_view
 from robothand import hand
@@ -34,7 +34,7 @@ class HandView(scene_view.SceneView):
 
 
 if __name__ == '__main__':
-    from PyQt4 import QtGui
+    from PyQt5 import QtGui
     import sys
 
     app = QtGui.QApplication(sys.argv)

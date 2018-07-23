@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 import os
 import math
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
+from PyQt5 import QtCore, QtWidgets, uic
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 
-class ServoControl(QtGui.QGroupBox):
+class ServoControl(QtWidgets.QGroupBox):
     value_changed = pyqtSignal(int, int)
     angle_changed = pyqtSignal(int, float)
     remove_control = pyqtSignal(object)
@@ -20,7 +20,7 @@ class ServoControl(QtGui.QGroupBox):
                      math.pi, 2500], "index": 1, "value": 500},
                  parent=None):
 
-        super(QtGui.QGroupBox, self).__init__(parent)
+        super(QtWidgets.QGroupBox, self).__init__(parent)
         uic.loadUi(os.path.join(os.path.split(__file__)
                                 [0], "servo_control.ui"), self)
         self.settings = settings
@@ -359,9 +359,9 @@ if __name__ == '__main__':
     logging.basicConfig(
         format='%(levelname)s %(name)s::%(funcName)s%(message)s',
         level=logging.DEBUG)
-    logging.getLogger("PyQt4").setLevel(logging.INFO)
+    logging.getLogger("PyQt5").setLevel(logging.INFO)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = ServoControl()
     app.installEventFilter(widget)
     widget.show()
