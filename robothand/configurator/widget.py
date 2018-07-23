@@ -10,6 +10,7 @@ from PyQt5.QtCore import pyqtSlot
 from robothand.protocol.hand_protocol import HandProtocol
 from engine_3d import vector
 import time
+import serial
 
 
 LOG = logging.getLogger(__name__)
@@ -72,19 +73,22 @@ class Configurator(QtWidgets.QMainWindow):
         '''Подключим руку'''
 
         if self.controll_thread is None:
-            self.proto = HandProtocol(port=str(
-                self.lineEdit_port_name.text()), baudrate=128000)
-            for index, limmit in\
-                    self.groupBox_settings.get_protocol_settings().items():
-                self.proto.set_limmit(index, limmit)
-                self.scene_view.hand.set_angle_range_changed(
-                    index, limmit[0][0], limmit[1][0])
+            try:
+                self.proto = HandProtocol(port=str(
+                    self.lineEdit_port_name.text()), baudrate=128000)
+                for index, limmit in\
+                        self.groupBox_settings.get_protocol_settings().items():
+                    self.proto.set_limmit(index, limmit)
+                    self.scene_view.hand.set_angle_range_changed(
+                        index, limmit[0][0], limmit[1][0])
 
-            self.lineEdit_port_name.setEnabled(False)
-            self.scene_view.hand.cmd_queue = Queue.Queue()
-            self.controll_thread = threading.Thread(target=self.proto_proc)
-            self.controll_thread.start()
-            self.pushButton_connect.setText(u'Отключить')
+                self.lineEdit_port_name.setEnabled(False)
+                self.scene_view.hand.cmd_queue = Queue.Queue()
+                self.controll_thread = threading.Thread(target=self.proto_proc)
+                self.controll_thread.start()
+                self.pushButton_connect.setText(u'Отключить')
+            except serial.serialutil.SerialException as e:
+                QtWidgets.QMessageBox.warning(self, "Cannot open port", str(e))
         else:
             self.lineEdit_port_name.setEnabled(True)
             self.scene_view.hand.cmd_queue.put(None)

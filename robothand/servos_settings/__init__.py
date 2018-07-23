@@ -95,7 +95,7 @@ class ServosSettings(QtWidgets.QGroupBox):
     def on_pushButton_save_settings_clicked(self, v):
         file_name = QtWidgets.QFileDialog.getSaveFileName(
             self, u"Сохраним файл",
-            self.settings.value("last_file").toString(), "Settings (*.json)")
+            self.settings.value("last_file"), "Settings (*.json)")
 
         if len(file_name):
             self.lineEdit_file.setText(file_name)
@@ -107,7 +107,7 @@ class ServosSettings(QtWidgets.QGroupBox):
     def on_pushButton_open_settings_clicked(self, v):
         file_name = QtWidgets.QFileDialog.getOpenFileName(
             self, u"Открыть настройки",
-            self.settings.value("last_file").toString(), "Settings (*.json)")
+            self.settings.value("last_file"), "Settings (*.json)")[0]
         self.open_settings(file_name)
 
     def open_settings(self, file_name):
@@ -119,7 +119,7 @@ class ServosSettings(QtWidgets.QGroupBox):
             while len(self.controlls):
                 self.remove_control(self.controlls[0])
             try:
-                for c_s in json.loads(open(file_name, "rb").read()):
+                for c_s in json.loads(open(file_name, "r").read()):
                     self.add_control(c_s)
             except IOError as e:
                 logger.warning(e)

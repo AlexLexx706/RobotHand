@@ -1,10 +1,9 @@
 Программа настроки и управления модели руки робота,
 Также программа позволяет управлять реальной рукой робота в соответствии с настройками.
-Работает под python 2.7
+Работает под python 3.5
 Устновка ubuntu:
 ---------
-0. Установка PyQt: sudo apt-get install python-qt4 python-qt4-gl
-1. Установка виртуального окружения: virtualenv venv --system-site-packages
+1. Установка виртуального окружения: virtualenv -p python3 venv
 2. Запуск виртуального окружения: source venv/bin/activate
 2. Установка requirements: pip install -r requirements.txt
 3. Установка приложения: python setup.py install
@@ -22,9 +21,7 @@
 -----------------------
 0. Установка виртуального окружения: virtualenv venv
 1. Активация окружения: venv\Scripts\activate
-2. Скачать: PyQt, numpy, scipy из http://www.lfd.uci.edu/~gohlke/pythonlibs
-3. установка: pip install PyQt4-4.11.4-cp27-none-win_amd64.whl numpy-1.11.2+mkl-cp27-cp27m-win_amd64.whl scipy-0.18.1-cp27-cp27m-win_amd64.whl PyOpenGL-3.1.1-cp27-cp27m-win_amd64.whl
-2. Установка requirements: pip install -r requirements.win.txt
+2. Установка requirements: pip install -r requirements.txt
 3. Установка приложения: python setup.py install
 
 Запуск:
