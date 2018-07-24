@@ -2,6 +2,7 @@
 from PyQt5.QtCore import pyqtSignal
 import logging
 from engine_3d import scene_view
+from engine_3d import sphere
 from robothand import hand
 
 LOG = logging.getLogger()
@@ -13,6 +14,8 @@ class HandView(scene_view.SceneView):
 
     def __init__(self, parent=None):
         scene_view.SceneView.__init__(self, parent)
+        self.sphere = sphere.Sphere(
+            radius=10)
         self.hand = hand.Hand()
         self.hand.set_save_state()
 
