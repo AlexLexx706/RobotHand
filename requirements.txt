@@ -1,2 +1,2 @@
 pyserial==3.4
--e git+https://github.com/AlexLexx706/engine_3d.git@a7baac1097fdc6e19d6086d1f47bcecf3488cbd6#egg=engine_3d
+-e git+https://github.com/AlexLexx706/engine_3d.git@master#egg=engine_3d
